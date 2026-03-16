@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logoutUser } from "@/store/slices/authSlice";
 import { useRouter } from "next/navigation";
+import { LogOut, UserCircle } from "lucide-react";
 
 export default function Navbar() {
   const dispatch = useAppDispatch();
@@ -16,24 +17,35 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-zinc-200 bg-white px-6 shadow-sm">
-      <Link href={isAuthenticated ? "/dashboard" : "/"} className="text-xl font-bold text-zinc-900">
-        WelfareApp
-      </Link>
+    <nav className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-gov-mid-blue/20 bg-white px-6 shadow-sm">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-8 flex-col items-center justify-center rounded bg-gradient-to-b from-gov-light-blue/20 to-gov-light-gray border border-gov-mid-blue/20 text-[10px] font-bold text-gov-dark-blue shadow-inner">
+          <span>GOI</span>
+        </div>
+        <Link href={isAuthenticated ? "/dashboard" : "/"} className="text-xl font-bold text-gov-dark-blue tracking-tight">
+          WelfareApp
+        </Link>
+      </div>
 
       <div className="flex items-center gap-4">
         {isAuthenticated && user ? (
           <>
-            <span className="hidden text-sm text-zinc-600 sm:inline">
-              {user.name}{" "}
-              <span className="rounded bg-zinc-100 px-2 py-0.5 text-xs font-medium uppercase text-zinc-500">
-                {user.role}
-              </span>
-            </span>
+            <div className="hidden items-center gap-3 sm:flex border-r border-gray-200 pr-4">
+              <UserCircle className="h-8 w-8 text-gov-slate" />
+              <div className="flex flex-col">
+                <span className="text-sm font-semibold text-gov-dark-blue leading-tight">
+                  {user.name}
+                </span>
+                <span className="text-[10px] font-medium uppercase tracking-wider text-gov-mid-blue">
+                  {user.role} Account
+                </span>
+              </div>
+            </div>
             <button
               onClick={handleLogout}
-              className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700"
+              className="inline-flex items-center rounded-md bg-white border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
             >
+              <LogOut className="mr-2 h-4 w-4" />
               Logout
             </button>
           </>
@@ -41,15 +53,9 @@ export default function Navbar() {
           <div className="flex gap-2">
             <Link
               href="/login"
-              className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+              className="rounded-md border border-gov-mid-blue px-4 py-2 text-sm font-medium text-gov-dark-blue transition-colors hover:bg-gov-light-gray"
             >
               Login
-            </Link>
-            <Link
-              href="/register"
-              className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700"
-            >
-              Register
             </Link>
           </div>
         )}

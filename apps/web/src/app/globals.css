@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Helvetica Neue';
+  src: url('/fonts/Helvetica-Neue-CE-55-Roman.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -8,19 +16,16 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  --color-gov-dark-blue: #274c77;
+  --color-gov-mid-blue: #6096ba;
+  --color-gov-light-blue: #a3cef1;
+  --color-gov-light-gray: #e7ecef;
+  --color-gov-slate: #8b8c89;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
 }
