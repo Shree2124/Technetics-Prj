@@ -2,31 +2,27 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface ICitizenProfile extends Document {
   userId: mongoose.Types.ObjectId;
+  fullName: string;
+  aadhaarNumber: string;
+  phone: string;
+  age: number;
+  gender: string;
+  address: {
+    state: string;
+    district: string;
+    village: string;
+    pincode: string;
+  };
+  ruralFlag: boolean;
   income: number;
-  employment_status:
-    | "employed"
-    | "unemployed"
-    | "informal"
-    | "self_employed"
-    | "retired";
-  family_size: number;
-  education_level:
-    | "primary"
-    | "secondary"
-    | "graduate"
-    | "postgraduate"
-    | "none";
-  health_condition: boolean;
-  housing_type: "temporary" | "permanent" | "rented" | "homeless";
-  disaster_risk: "low" | "medium" | "high";
-  address: string;
-  district: string;
-  phoneNumber?: string;
-  documents?: string[];
-  vulnerabilityScore?: number;
-  verificationStatus: "pending" | "verified" | "rejected";
+  employmentStatus: string;
+  educationLevel: string;
+  familySize: number;
+  healthCondition: boolean;
+  disability: boolean;
+  propertyOwned: number;
+  bankAccount: string;
   createdAt: Date;
-  updatedAt: Date;
 }
 
 const CitizenProfileSchema = new Schema<ICitizenProfile>(
@@ -37,41 +33,28 @@ const CitizenProfileSchema = new Schema<ICitizenProfile>(
       required: true,
       unique: true,
     },
+    fullName: { type: String, required: true },
+    aadhaarNumber: { type: String, required: true, unique: true },
+    phone: { type: String, required: true },
+    age: { type: Number, required: true },
+    gender: { type: String, required: true },
+    address: {
+      state: { type: String, required: true },
+      district: { type: String, required: true },
+      village: { type: String, required: true },
+      pincode: { type: String, required: true },
+    },
+    ruralFlag: { type: Boolean, default: false },
     income: { type: Number, default: 0 },
-    employment_status: {
-      type: String,
-      enum: ["employed", "unemployed", "informal", "self_employed", "retired"],
-      default: "unemployed",
-    },
-    family_size: { type: Number, default: 1, min: 1 },
-    education_level: {
-      type: String,
-      enum: ["primary", "secondary", "graduate", "postgraduate", "none"],
-      default: "primary",
-    },
-    health_condition: { type: Boolean, default: false },
-    housing_type: {
-      type: String,
-      enum: ["temporary", "permanent", "rented", "homeless"],
-      default: "temporary",
-    },
-    disaster_risk: {
-      type: String,
-      enum: ["low", "medium", "high"],
-      default: "medium",
-    },
-    address: { type: String, default: "" },
-    district: { type: String, default: "" },
-    phoneNumber: { type: String, default: "" },
-    documents: [{ type: String }],
-    vulnerabilityScore: { type: Number, default: 0, min: 0, max: 100 },
-    verificationStatus: {
-      type: String,
-      enum: ["pending", "verified", "rejected"],
-      default: "pending",
-    },
+    employmentStatus: { type: String, default: "unemployed" },
+    educationLevel: { type: String, default: "none" },
+    familySize: { type: Number, default: 1 },
+    healthCondition: { type: Boolean, default: false },
+    disability: { type: Boolean, default: false },
+    propertyOwned: { type: Number, default: 0 },
+    bankAccount: { type: String },
   },
-  { timestamps: true },
+  { timestamps: { createdAt: true, updatedAt: false } },
 );
 
 // Delete stale cached model to avoid schema mismatch during dev hot reloads
