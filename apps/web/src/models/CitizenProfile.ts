@@ -74,8 +74,12 @@ const CitizenProfileSchema = new Schema<ICitizenProfile>(
   { timestamps: true },
 );
 
+// Delete stale cached model to avoid schema mismatch during dev hot reloads
+if (mongoose.models.CitizenProfile) {
+  delete mongoose.models.CitizenProfile;
+}
+
 const CitizenProfile: Model<ICitizenProfile> =
-  mongoose.models.CitizenProfile ||
   mongoose.model<ICitizenProfile>("CitizenProfile", CitizenProfileSchema);
 
 export default CitizenProfile;

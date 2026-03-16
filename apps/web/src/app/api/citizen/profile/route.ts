@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import CitizenProfile from "@/models/CitizenProfile";
+import User from "@/models/User";
 import { getCurrentUser } from "@/lib/auth";
 
 export async function GET() {
@@ -15,12 +16,12 @@ export async function GET() {
       );
     }
 
-    const profile = await CitizenProfile.findOne({ userId: currentUser._id });
+    // Upsert: create a blank profile if one doesn't exist yet
+    let profile = await CitizenProfile.findOne({ userId: currentUser._id });
     if (!profile) {
-      return NextResponse.json(
-        { success: false, message: "Profile not found" },
-        { status: 404 },
-      );
+      profile = await CitizenProfile.create({ userId: currentUser._id });
+      // Link profile to user document
+      await User.findByIdAndUpdate(currentUser._id, { profile: profile._id });
     }
 
     return NextResponse.json({ success: true, profile });
@@ -46,21 +47,22 @@ export async function PUT(req: NextRequest) {
 
     const updates = await req.json();
 
-    // Prevent citizens from changing verification status
+    // Prevent citizens from changing sensitive fields
     delete updates.verificationStatus;
+    delete updates.vulnerabilityScore;
     delete updates.user;
+    delete updates.userId;
+    delete updates._id;
 
     const profile = await CitizenProfile.findOneAndUpdate(
       { userId: currentUser._id },
-      updates,
-      { new: true, runValidators: true },
+      { $set: updates },
+      { new: true, runValidators: true, upsert: true },
     );
 
-    if (!profile) {
-      return NextResponse.json(
-        { success: false, message: "Profile not found" },
-        { status: 404 },
-      );
+    // Ensure user.profile reference is linked
+    if (profile && !currentUser.profile) {
+      await User.findByIdAndUpdate(currentUser._id, { profile: profile._id });
     }
 
     return NextResponse.json({ success: true, profile });

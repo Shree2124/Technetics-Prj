@@ -1,7 +1,30 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useAppSelector } from "@/store/hooks";
-import { Users, FileText, CheckCircle, Clock, AlertTriangle, ShieldCheck, CreditCard, Activity } from "lucide-react";
+import Link from "next/link";
+import api from "@/lib/axios";
+import {
+  Users, FileText, CheckCircle, Clock, AlertTriangle, ShieldCheck,
+  CreditCard, Activity, IndianRupee, Heart, Home, MapPin, Briefcase,
+  ArrowRight, TrendingUp, Gauge, UserCheck, Shield,
+} from "lucide-react";
+
+interface CitizenProfileData {
+  income: number;
+  employment_status: string;
+  family_size: number;
+  education_level: string;
+  health_condition: boolean;
+  housing_type: string;
+  disaster_risk: string;
+  address: string;
+  district: string;
+  phoneNumber: string;
+  documents: string[];
+  vulnerabilityScore: number;
+  verificationStatus: string;
+}
 
 export default function DashboardPage() {
   const { user } = useAppSelector((state) => state.auth);
@@ -11,15 +34,15 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header Section */}
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold tracking-tight text-gov-dark-blue">Dashboard Overview</h1>
-        <p className="text-sm text-gov-slate">
-          Welcome back to the portal, <span className="font-semibold text-gov-dark-blue">{user.name}</span>. 
-          Your session is <span className="text-green-600 font-medium">secured and active</span>.
+      <div className="flex flex-col gap-1">
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-gov-dark-blue">
+          Dashboard Overview
+        </h1>
+        <p className="text-sm text-gray-500">
+          Welcome back, <span className="font-semibold text-gov-dark-blue">{user.name}</span>
         </p>
       </div>
 
-      {/* Role-Specific Content */}
       {user.role === "admin" && <AdminDashboard />}
       {user.role === "verifier" && <VerifierDashboard />}
       {user.role === "citizen" && <CitizenDashboard />}
@@ -27,165 +50,150 @@ export default function DashboardPage() {
   );
 }
 
-function AdminDashboard() {
-  return (
-    <div className="space-y-8">
-      {/* Analytics Summary */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Total Citizens" value="1.24M" icon={<Users />} trend="+12.5%" />
-        <StatCard title="Active Schemes" value="48" icon={<Activity />} trend="Stable" />
-        <StatCard title="Verification Requests" value="3,429" icon={<FileText />} trend="-2.4%" />
-        <StatCard title="Funds Disbursed" value="₹450Cr" icon={<CreditCard />} trend="+8.1%" />
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Quick Actions */}
-        <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
-          <div className="border-b border-gray-100 bg-gray-50/80 px-4 py-3">
-            <h2 className="text-sm font-semibold text-gov-dark-blue flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-gov-mid-blue" />
-              Administrative Actions
-            </h2>
-          </div>
-          <div className="p-4 flex flex-col gap-3">
-            <button className="text-left px-4 py-3 rounded-md bg-gov-light-gray hover:bg-gov-mid-blue/10 text-sm font-medium text-gov-dark-blue transition-colors">
-              Manage System Users & Roles
-            </button>
-            <button className="text-left px-4 py-3 rounded-md bg-gov-light-gray hover:bg-gov-mid-blue/10 text-sm font-medium text-gov-dark-blue transition-colors">
-              View Audit Logs
-            </button>
-            <button className="text-left px-4 py-3 rounded-md bg-gov-light-gray hover:bg-gov-mid-blue/10 text-sm font-medium text-gov-dark-blue transition-colors">
-              Configure Welfare Parameters
-            </button>
-          </div>
-        </div>
-
-        {/* System Health */}
-        <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
-          <div className="border-b border-gray-100 bg-gray-50/80 px-4 py-3">
-            <h2 className="text-sm font-semibold text-gov-dark-blue flex items-center gap-2">
-              <Activity className="h-4 w-4 text-green-600" />
-              Real-time System Status
-            </h2>
-          </div>
-          <div className="p-4 flex flex-col divide-y divide-gray-100">
-            <div className="flex justify-between py-2 items-center">
-              <span className="text-sm text-gray-600">Database Integrity</span>
-              <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">Optimal</span>
-            </div>
-            <div className="flex justify-between py-2 items-center">
-              <span className="text-sm text-gray-600">API Gateway</span>
-              <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">99.9% Uptime</span>
-            </div>
-            <div className="flex justify-between py-2 items-center">
-              <span className="text-sm text-gray-600">Sync with UIDAI</span>
-              <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full font-medium">Minor Lag</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function VerifierDashboard() {
-  return (
-    <div className="space-y-8">
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard title="Pending Verifications" value="142" icon={<Clock className="text-amber-500" />} />
-        <StatCard title="Processed Today" value="38" icon={<CheckCircle className="text-green-500" />} />
-        <StatCard title="Flagged Issues" value="4" icon={<AlertTriangle className="text-red-500" />} />
-      </div>
-
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
-        <div className="border-b border-gray-100 bg-gray-50/80 px-4 py-3 flex justify-between items-center">
-          <h2 className="text-sm font-semibold text-gov-dark-blue flex items-center gap-2">
-            <FileText className="h-4 w-4 text-gov-mid-blue" />
-            Priority Queue
-          </h2>
-          <button className="text-xs font-medium text-gov-mid-blue hover:underline">View All</button>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-100">
-              <tr>
-                <th className="px-4 py-3 font-medium">Applicant Name</th>
-                <th className="px-4 py-3 font-medium">Scheme Type</th>
-                <th className="px-4 py-3 font-medium">Date Submitted</th>
-                <th className="px-4 py-3 font-medium">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {[1, 2, 3, 4].map((i) => (
-                <tr key={i} className="hover:bg-gray-50/50">
-                  <td className="px-4 py-3 font-medium text-gray-900">Applicant {i}</td>
-                  <td className="px-4 py-3 text-gray-600">PM Kisan Scheme</td>
-                  <td className="px-4 py-3 text-gray-500">Oct {14 - i}, 2026</td>
-                  <td className="px-4 py-3">
-                    <button className="text-gov-mid-blue font-medium hover:text-gov-dark-blue">Review</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-}
+/* ─── CITIZEN DASHBOARD ────────────────────────────────────────────── */
 
 function CitizenDashboard() {
+  const [profile, setProfile] = useState<CitizenProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get("/api/citizen/profile")
+      .then((res) => setProfile(res.data.profile))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-gov-mid-blue border-t-transparent" />
+      </div>
+    );
+  }
+
+  const statusColor = profile?.verificationStatus === "verified"
+    ? "bg-green-100 text-green-700 border-green-200"
+    : profile?.verificationStatus === "rejected"
+      ? "bg-red-100 text-red-700 border-red-200"
+      : "bg-amber-100 text-amber-700 border-amber-200";
+
+  const riskColor = profile?.disaster_risk === "high"
+    ? "text-red-600"
+    : profile?.disaster_risk === "medium"
+      ? "text-amber-600"
+      : "text-green-600";
+
   return (
-    <div className="space-y-8">
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* Profile Summary Card */}
-        <div className="col-span-1 rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden flex flex-col text-center p-6 items-center">
-          <div className="h-16 w-16 bg-gov-light-gray rounded-full flex items-center justify-center mb-4">
-            <Users className="h-8 w-8 text-gov-mid-blue" />
+    <div className="space-y-6">
+      {/* Stats Grid */}
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          title="Monthly Income"
+          value={profile ? `₹${profile.income.toLocaleString("en-IN")}` : "—"}
+          icon={<IndianRupee className="h-5 w-5" />}
+          color="text-green-600 bg-green-50"
+        />
+        <StatCard
+          title="Vulnerability Score"
+          value={profile ? `${profile.vulnerabilityScore}/100` : "—"}
+          icon={<Gauge className="h-5 w-5" />}
+          color="text-amber-600 bg-amber-50"
+        />
+        <StatCard
+          title="Verification"
+          value={profile?.verificationStatus || "—"}
+          icon={<UserCheck className="h-5 w-5" />}
+          color={profile?.verificationStatus === "verified" ? "text-green-600 bg-green-50" : "text-amber-600 bg-amber-50"}
+          capitalize
+        />
+        <StatCard
+          title="Family Size"
+          value={profile ? `${profile.family_size} Members` : "—"}
+          icon={<Users className="h-5 w-5" />}
+          color="text-blue-600 bg-blue-50"
+        />
+      </div>
+
+      {/* Second Row */}
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+        <InfoCard icon={<Briefcase />} label="Employment" value={profile?.employment_status?.replace("_", " ") || "—"} />
+        <InfoCard icon={<Home />} label="Housing" value={profile?.housing_type || "—"} />
+        <InfoCard icon={<MapPin />} label="District" value={profile?.district || "—"} />
+        <InfoCard icon={<AlertTriangle className={riskColor} />} label="Disaster Risk" value={profile?.disaster_risk || "—"} />
+      </div>
+
+      {/* Quick Links + Recent */}
+      <div className="grid gap-4 md:grid-cols-2">
+        {/* Quick Actions */}
+        <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <div className="border-b border-gray-100 bg-gray-50/60 px-5 py-3">
+            <h2 className="text-sm font-semibold text-gov-dark-blue">Quick Actions</h2>
           </div>
-          <h3 className="text-lg font-bold text-gov-dark-blue">Verified Citizen</h3>
-          <p className="text-xs text-gray-500 mt-1 mb-4">KYC Status: <span className="text-green-600 font-medium">Complete</span></p>
-          <button className="mt-auto w-full py-2 rounded border border-gray-200 text-sm font-medium hover:bg-gray-50 transition-colors">
-            Update Profile
-          </button>
+          <div className="p-4 space-y-2">
+            <Link
+              href="/citizen/schemes"
+              className="flex items-center justify-between rounded-lg border border-gray-100 px-4 py-3 text-sm font-medium text-gov-dark-blue hover:bg-gov-dark-blue/5 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <FileText className="h-4 w-4 text-gov-mid-blue" />
+                Browse & Apply for Schemes
+              </div>
+              <ArrowRight className="h-4 w-4 text-gray-400" />
+            </Link>
+            <Link
+              href="/citizen/applications"
+              className="flex items-center justify-between rounded-lg border border-gray-100 px-4 py-3 text-sm font-medium text-gov-dark-blue hover:bg-gov-dark-blue/5 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Clock className="h-4 w-4 text-gov-mid-blue" />
+                Track My Applications
+              </div>
+              <ArrowRight className="h-4 w-4 text-gray-400" />
+            </Link>
+            <Link
+              href="/citizen/profile"
+              className="flex items-center justify-between rounded-lg border border-gray-100 px-4 py-3 text-sm font-medium text-gov-dark-blue hover:bg-gov-dark-blue/5 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Users className="h-4 w-4 text-gov-mid-blue" />
+                Update My Profile
+              </div>
+              <ArrowRight className="h-4 w-4 text-gray-400" />
+            </Link>
+          </div>
         </div>
 
-        {/* Direct Benefits Transfer Status */}
-        <div className="col-span-1 lg:col-span-2 rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
-          <div className="border-b border-gray-100 bg-gray-50/80 px-4 py-3">
-            <h2 className="text-sm font-semibold text-gov-dark-blue flex items-center gap-2">
-              <CreditCard className="h-4 w-4 text-gov-mid-blue" />
-              Benefit Applications
-            </h2>
+        {/* Documents Status */}
+        <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <div className="border-b border-gray-100 bg-gray-50/60 px-5 py-3">
+            <h2 className="text-sm font-semibold text-gov-dark-blue">Uploaded Documents</h2>
           </div>
-          <div className="p-0">
-            <div className="flex items-center justify-between p-4 border-b border-gray-100 hover:bg-gray-50/50">
-              <div>
-                <p className="font-medium text-sm text-gray-900">National Scholarship Scheme</p>
-                <p className="text-xs text-gray-500 mt-0.5">Applied: 12 Aug 2026</p>
+          <div className="p-4">
+            {profile?.documents && profile.documents.length > 0 ? (
+              <div className="space-y-2">
+                {profile.documents.map((doc, i) => (
+                  <div key={i} className="flex items-center gap-3 rounded-lg bg-gray-50 px-4 py-2.5 text-sm">
+                    <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                    <span className="text-gray-700 capitalize">{doc.replace(/_/g, " ").replace(".pdf", "")}</span>
+                  </div>
+                ))}
               </div>
-              <span className="px-2.5 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">Active</span>
-            </div>
-            <div className="flex items-center justify-between p-4 hover:bg-gray-50/50">
-              <div>
-                <p className="font-medium text-sm text-gray-900">Housing Subsidy Yojana</p>
-                <p className="text-xs text-gray-500 mt-0.5">Applied: 02 Oct 2026</p>
-              </div>
-              <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs rounded-full font-medium">Under Review</span>
-            </div>
+            ) : (
+              <p className="text-sm text-gray-400 text-center py-6">No documents uploaded yet</p>
+            )}
           </div>
         </div>
       </div>
-      
-      {/* Help Section */}
-      <div className="rounded-lg bg-gov-light-blue/10 border border-gov-light-blue/20 p-4 flex gap-4 items-start">
-        <div className="p-2 bg-white rounded-full shrink-0">
-          <FileText className="h-5 w-5 text-gov-mid-blue" />
+
+      {/* Help Banner */}
+      <div className="rounded-xl bg-gradient-to-r from-gov-dark-blue to-gov-mid-blue p-5 flex gap-4 items-start text-white">
+        <div className="p-2 bg-white/20 rounded-lg shrink-0">
+          <Shield className="h-5 w-5" />
         </div>
         <div>
-          <h3 className="text-sm font-semibold text-gov-dark-blue">Need assistance with your applications?</h3>
-          <p className="text-xs text-gov-slate mt-1 max-w-2xl">
-            You can verify your uploaded documents or contact your district nodal officer directly from the portal. Refer to the standard guidelines for required KYC modifications.
+          <h3 className="text-sm font-semibold">Need Help?</h3>
+          <p className="text-xs text-white/80 mt-1 max-w-2xl leading-relaxed">
+            Contact your district nodal officer or visit the nearest Common Service Centre (CSC) for assistance with application submission and document verification.
           </p>
         </div>
       </div>
@@ -193,22 +201,60 @@ function CitizenDashboard() {
   );
 }
 
-function StatCard({ title, value, icon, trend }: { title: string, value: string, icon: React.ReactNode, trend?: string }) {
+/* ─── ADMIN DASHBOARD (kept from before) ─────────────────────────── */
+
+function AdminDashboard() {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm flex flex-col">
-      <div className="flex justify-between items-start mb-4">
-        <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">{title}</p>
-        <div className="text-gov-mid-blue bg-gov-light-gray p-1.5 rounded-md">
-          {icon}
-        </div>
+    <div className="space-y-6">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+        <StatCard title="Total Citizens" value="1.24M" icon={<Users className="h-5 w-5" />} color="text-blue-600 bg-blue-50" />
+        <StatCard title="Active Schemes" value="48" icon={<Activity className="h-5 w-5" />} color="text-green-600 bg-green-50" />
+        <StatCard title="Pending Requests" value="3,429" icon={<FileText className="h-5 w-5" />} color="text-amber-600 bg-amber-50" />
+        <StatCard title="Funds Disbursed" value="₹450Cr" icon={<CreditCard className="h-5 w-5" />} color="text-purple-600 bg-purple-50" />
       </div>
-      <div className="mt-auto flex items-end justify-between">
-        <p className="text-2xl font-bold text-gov-dark-blue">{value}</p>
-        {trend && (
-          <span className={`text-xs font-medium ${trend.startsWith('+') || trend === 'Stable' ? 'text-green-600' : 'text-red-500'}`}>
-            {trend}
-          </span>
-        )}
+    </div>
+  );
+}
+
+/* ─── VERIFIER DASHBOARD (kept from before) ──────────────────────── */
+
+function VerifierDashboard() {
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-3">
+        <StatCard title="Pending Verifications" value="142" icon={<Clock className="h-5 w-5" />} color="text-amber-600 bg-amber-50" />
+        <StatCard title="Processed Today" value="38" icon={<CheckCircle className="h-5 w-5" />} color="text-green-600 bg-green-50" />
+        <StatCard title="Flagged Issues" value="4" icon={<AlertTriangle className="h-5 w-5" />} color="text-red-600 bg-red-50" />
+      </div>
+    </div>
+  );
+}
+
+/* ─── SHARED COMPONENTS ──────────────────────────────────────────── */
+
+function StatCard({ title, value, icon, color, capitalize }: {
+  title: string; value: string; icon: React.ReactNode; color: string; capitalize?: boolean;
+}) {
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white p-4 md:p-5 shadow-sm">
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">{title}</p>
+        <div className={`p-2 rounded-lg ${color}`}>{icon}</div>
+      </div>
+      <p className={`text-lg md:text-2xl font-bold text-gov-dark-blue ${capitalize ? "capitalize" : ""}`}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function InfoCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm flex items-center gap-3">
+      <div className="p-2 rounded-lg bg-gray-100 text-gray-500 flex-shrink-0">{icon}</div>
+      <div className="min-w-0">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">{label}</p>
+        <p className="text-sm font-semibold text-gov-dark-blue capitalize truncate">{value}</p>
       </div>
     </div>
   );
