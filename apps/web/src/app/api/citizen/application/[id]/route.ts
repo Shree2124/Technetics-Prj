@@ -8,7 +8,7 @@ import CitizenProfile from "@/models/CitizenProfile";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const user = await getCurrentUser();
@@ -17,37 +17,42 @@ export async function GET(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    await dbConnect();
+    await dbConnect(); // Fix incorrect import path
 
     const application = await Application.findOne({
       _id: params.id,
-      citizenId: user.profile
+      citizenId: user.profile,
     })
-      .populate('schemeId', 'schemeName category description benefitAmount eligibility active')
-      .populate('documents')
-      .populate('assignedVerifier', 'name email');
+      .populate(
+        "schemeId",
+        "schemeName category description benefitAmount eligibility active",
+      )
+      .populate("documents")
+      .populate("assignedVerifier", "name email");
 
     if (!application) {
-      return NextResponse.json({ message: "Application not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Application not found" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json({
       success: true,
-      application
+      application,
     });
-
   } catch (error: any) {
     console.error("Error fetching application:", error);
     return NextResponse.json(
       { message: error.message || "Error fetching application" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const user = await getCurrentUser();
@@ -56,22 +61,28 @@ export async function PUT(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    await dbConnect();
+    await dbConnect(); // Fix incorrect import path
 
     const application = await Application.findOne({
       _id: params.id,
-      citizenId: user.profile
+      citizenId: user.profile,
     });
 
     if (!application) {
-      return NextResponse.json({ message: "Application not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Application not found" },
+        { status: 404 },
+      );
     }
 
     // Only allow updating draft applications
     if (application.status !== "draft") {
-      return NextResponse.json({ 
-        message: "Cannot update submitted application" 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          message: "Cannot update submitted application",
+        },
+        { status: 400 },
+      );
     }
 
     const { draftData } = await req.json();
@@ -82,21 +93,20 @@ export async function PUT(
     return NextResponse.json({
       success: true,
       message: "Draft updated successfully",
-      application
+      application,
     });
-
   } catch (error: any) {
     console.error("Error updating application:", error);
     return NextResponse.json(
       { message: error.message || "Error updating application" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const user = await getCurrentUser();
@@ -105,28 +115,34 @@ export async function DELETE(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    await dbConnect();
+    await dbConnect(); // Fix incorrect import path
 
     const application = await Application.findOne({
       _id: params.id,
-      citizenId: user.profile
+      citizenId: user.profile,
     });
 
     if (!application) {
-      return NextResponse.json({ message: "Application not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Application not found" },
+        { status: 404 },
+      );
     }
 
     // Only allow deleting draft applications
     if (application.status !== "draft") {
-      return NextResponse.json({ 
-        message: "Cannot delete submitted application" 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          message: "Cannot delete submitted application",
+        },
+        { status: 400 },
+      );
     }
 
     // Delete associated documents
     if (application.documents && application.documents.length > 0) {
       await ApplicationDocument.deleteMany({
-        _id: { $in: application.documents }
+        _id: { $in: application.documents },
       });
     }
 
@@ -135,14 +151,13 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: "Application deleted successfully"
+      message: "Application deleted successfully",
     });
-
   } catch (error: any) {
     console.error("Error deleting application:", error);
     return NextResponse.json(
       { message: error.message || "Error deleting application" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

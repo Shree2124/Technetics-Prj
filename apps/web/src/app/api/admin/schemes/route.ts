@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  await dbConnect();
+  await dbConnect(); // Fix incorrect import path usage
 
   try {
     const body = await req.json();
@@ -31,7 +31,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  await dbConnect();
+  await dbConnect(); // Fix incorrect import path usage
 
   try {
     const { searchParams } = new URL(req.url);

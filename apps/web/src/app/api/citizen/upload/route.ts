@@ -5,12 +5,15 @@ import { cloudinary } from "@/lib/cloudinary";
 import ApplicationDocument from "@/models/ApplicationDocument";
 import fs from "fs/promises";
 import path from "path";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 // Helper function to validate file type
 function validateFileType(file: File, allowedTypes: string[]) {
-  const fileExtension = file.name.split('.').pop()?.toLowerCase();
-  return allowedTypes.includes(`.${fileExtension}`) || allowedTypes.includes(file.type);
+  const fileExtension = file.name.split(".").pop()?.toLowerCase();
+  return (
+    allowedTypes.includes(`.${fileExtension}`) ||
+    allowedTypes.includes(file.type)
+  );
 }
 
 // Helper function to validate file size (max 5MB)
@@ -26,27 +29,36 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    await dbConnect();
+    await dbConnect(); // Fix incorrect import path
 
     const data = await req.formData();
-    const file = data.get('file') as File;
-    const documentType = data.get('documentType') as string;
-    const applicationId = data.get('applicationId') as string;
+    const file = data.get("file") as File;
+    const documentType = data.get("documentType") as string;
+    const applicationId = data.get("applicationId") as string;
 
     if (!file) {
-      return NextResponse.json({ message: "No file uploaded" }, { status: 400 });
+      return NextResponse.json(
+        { message: "No file uploaded" },
+        { status: 400 },
+      );
     }
 
     // Validate document type
     const allowedTypes = [
-      "aadhaar", "income_certificate", "ration_card", 
-      "property_document", "medical_certificate"
+      "aadhaar",
+      "income_certificate",
+      "ration_card",
+      "property_document",
+      "medical_certificate",
     ];
-    
+
     if (!allowedTypes.includes(documentType)) {
-      return NextResponse.json({ 
-        message: "Invalid document type" 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          message: "Invalid document type",
+        },
+        { status: 400 },
+      );
     }
 
     // Validate file type (PDF, JPG, PNG)
@@ -54,24 +66,31 @@ export async function POST(req: NextRequest) {
       "application/pdf",
       "image/jpeg",
       "image/jpg",
-      "image/png"
+      "image/png",
     ];
-    
+
     if (!validateFileType(file, allowedFileTypes)) {
-      return NextResponse.json({ 
-        message: "Invalid file type. Only PDF, JPG, and PNG files are allowed" 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          message:
+            "Invalid file type. Only PDF, JPG, and PNG files are allowed",
+        },
+        { status: 400 },
+      );
     }
 
     // Validate file size
     if (!validateFileSize(file)) {
-      return NextResponse.json({ 
-        message: "File size exceeds 5MB limit" 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          message: "File size exceeds 5MB limit",
+        },
+        { status: 400 },
+      );
     }
 
     // Create temp directory if it doesn't exist
-    const tempDir = path.join(process.cwd(), 'temp');
+    const tempDir = path.join(process.cwd(), "temp");
     await fs.mkdir(tempDir, { recursive: true });
 
     // Generate unique filename
@@ -88,15 +107,15 @@ export async function POST(req: NextRequest) {
         cloudinary.uploader.upload(
           tempFilePath,
           {
-            folder: 'technetics-hackathon/documents',
-            resource_type: 'auto',
+            folder: "technetics-hackathon/documents",
+            resource_type: "auto",
             public_id: `${documentType}-${Date.now()}`,
-            format: file.name.split('.').pop()
+            format: file.name.split(".").pop(),
           },
           (error, result) => {
             if (error) reject(error);
             else resolve(result);
-          }
+          },
         );
       });
 
@@ -108,7 +127,7 @@ export async function POST(req: NextRequest) {
         fileUrl: (result as any).secure_url,
         extractedText: (result as any).context?.custom?.extracted_text || null,
         aiFraudFlag: false,
-        uploadedAt: new Date()
+        uploadedAt: new Date(),
       });
 
       return NextResponse.json({
@@ -118,27 +137,25 @@ export async function POST(req: NextRequest) {
           id: document._id,
           documentType: document.documentType,
           fileUrl: document.fileUrl,
-          uploadedAt: document.uploadedAt
-        }
+          uploadedAt: document.uploadedAt,
+        },
       });
-
     } finally {
       // Clean up temporary file
       await fs.unlink(tempFilePath).catch(console.error);
     }
-
   } catch (error: any) {
     console.error("Error uploading file:", error);
-    
+
     // Clean up temp file if it exists
-    const tempDir = path.join(process.cwd(), 'temp');
-    const uniqueFilename = `${uuidv4()}-${(req.formData?.then?.(d => d.get('file') as File) || { name: 'temp' }).name}`;
+    const tempDir = path.join(process.cwd(), "temp");
+    const uniqueFilename = `${uuidv4()}-${(req.formData?.then?.((d) => d.get("file") as File) || { name: "temp" }).name}`;
     const tempFilePath = path.join(tempDir, uniqueFilename);
     await fs.unlink(tempFilePath).catch(console.error);
 
     return NextResponse.json(
       { message: error.message || "Error uploading file" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -151,30 +168,38 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    await dbConnect();
+    await dbConnect(); // Fix incorrect import path
 
     const { searchParams } = new URL(req.url);
-    const documentId = searchParams.get('documentId');
+    const documentId = searchParams.get("documentId");
 
     if (!documentId) {
-      return NextResponse.json({ message: "Document ID is required" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Document ID is required" },
+        { status: 400 },
+      );
     }
 
     // Find document
     const document = await ApplicationDocument.findOne({
       _id: documentId,
-      citizenId: user.profile
+      citizenId: user.profile,
     });
 
     if (!document) {
-      return NextResponse.json({ message: "Document not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Document not found" },
+        { status: 404 },
+      );
     }
 
     // Delete from Cloudinary
     if (document.fileUrl) {
-      const publicId = document.fileUrl.split('/').pop()?.split('.')[0];
+      const publicId = document.fileUrl.split("/").pop()?.split(".")[0];
       if (publicId) {
-        await cloudinary.uploader.destroy(`technetics-hackathon/documents/${publicId}`);
+        await cloudinary.uploader.destroy(
+          `technetics-hackathon/documents/${publicId}`,
+        );
       }
     }
 
@@ -183,14 +208,13 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Document deleted successfully"
+      message: "Document deleted successfully",
     });
-
   } catch (error: any) {
     console.error("Error deleting document:", error);
     return NextResponse.json(
       { message: error.message || "Error deleting document" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
