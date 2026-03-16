@@ -2,16 +2,16 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface ICitizenProfile extends Document {
   userId: mongoose.Types.ObjectId;
-  fullName: string;
-  aadhaarNumber: string;
-  phone: string;
-  age: number;
-  gender: string;
-  address: {
-    state: string;
-    district: string;
-    village: string;
-    pincode: string;
+  fullName?: string;
+  aadhaarNumber?: string;
+  phone?: string;
+  age?: number;
+  gender?: string;
+  address?: {
+    state?: string;
+    district?: string;
+    village?: string;
+    pincode?: string;
   };
   ruralFlag: boolean;
   income: number;
@@ -22,6 +22,8 @@ export interface ICitizenProfile extends Document {
   disability: boolean;
   propertyOwned: number;
   bankAccount: string;
+  verificationStatus: string;
+  vulnerabilityScore: number;
   createdAt: Date;
 }
 
@@ -34,7 +36,7 @@ const CitizenProfileSchema = new Schema<ICitizenProfile>(
       unique: true,
     },
     fullName: { type: String },
-    aadhaarNumber: { type: String, unique: true },
+    aadhaarNumber: { type: String, unique: true, sparse: true },
     phone: { type: String },
     age: { type: Number },
     gender: { type: String },
@@ -53,6 +55,12 @@ const CitizenProfileSchema = new Schema<ICitizenProfile>(
     disability: { type: Boolean, default: false },
     propertyOwned: { type: Number, default: 0 },
     bankAccount: { type: String },
+    verificationStatus: {
+      type: String,
+      enum: ["pending", "verified", "rejected"],
+      default: "pending",
+    },
+    vulnerabilityScore: { type: Number, default: 0 },
   },
   { timestamps: { createdAt: true, updatedAt: false } },
 );

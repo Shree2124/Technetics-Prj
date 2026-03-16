@@ -219,12 +219,45 @@ function AdminDashboard() {
 /* ─── VERIFIER DASHBOARD (kept from before) ──────────────────────── */
 
 function VerifierDashboard() {
+  const [stats, setStats] = useState({ pendingCount: 0, verifiedCount: 0, flaggedCount: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get("/api/verifier/stats")
+      .then((res) => setStats(res.data.stats))
+      .catch((err) => console.error("Failed to load stats", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-gov-mid-blue border-t-transparent" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-3">
-        <StatCard title="Pending Verifications" value="142" icon={<Clock className="h-5 w-5" />} color="text-amber-600 bg-amber-50" />
-        <StatCard title="Processed Today" value="38" icon={<CheckCircle className="h-5 w-5" />} color="text-green-600 bg-green-50" />
-        <StatCard title="Flagged Issues" value="4" icon={<AlertTriangle className="h-5 w-5" />} color="text-red-600 bg-red-50" />
+        <StatCard title="Pending Verifications" value={stats.pendingCount.toString()} icon={<Clock className="h-5 w-5" />} color="text-amber-600 bg-amber-50" />
+        <StatCard title="Total Processed" value={stats.verifiedCount.toString()} icon={<CheckCircle className="h-5 w-5" />} color="text-green-600 bg-green-50" />
+        <StatCard title="Flagged Issues" value={stats.flaggedCount.toString()} icon={<AlertTriangle className="h-5 w-5" />} color="text-red-600 bg-red-50" />
+      </div>
+      
+      {/* Quick Access Block */}
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-bold text-gov-dark-blue">Applications Review</h2>
+          <p className="text-sm text-gray-500 mt-1">You have {stats.pendingCount} pending applications waiting for your review.</p>
+        </div>
+        <Link 
+          href="/verifier/reviews"
+          className="rounded-lg bg-gov-dark-blue px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gov-dark-blue/90 flex items-center gap-2"
+        >
+          Start Reviewing
+          <ArrowRight className="h-4 w-4" />
+        </Link>
       </div>
     </div>
   );

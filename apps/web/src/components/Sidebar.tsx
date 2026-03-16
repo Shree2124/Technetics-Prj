@@ -17,7 +17,7 @@ const adminLinks = [
 
 const verifierLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/verifier/unverified", label: "Pending Verifications", icon: CheckCircle },
+  { href: "/verifier/reviews", label: "Applications Review", icon: CheckCircle },
 ];
 
 const citizenLinks = [
