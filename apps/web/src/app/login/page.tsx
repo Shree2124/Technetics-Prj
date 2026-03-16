@@ -28,16 +28,25 @@ export default function LoginPage() {
     e.preventDefault();
     dispatch(clearError());
 
-    // Pass rememberMe to the auth slice so it tells the backend to set a persistent cookie
-    const result = await dispatch(loginUser({ email, password, rememberMe }));
-    if (loginUser.fulfilled.match(result)) {
-      router.push("/dashboard");
+    // Check if it's an admin login
+    if (email === ADMIN_EMAIL) {
+      // Use admin login for admin credentials
+      const result = await dispatch(adminLogin({ email, password }));
+      if (adminLogin.fulfilled.match(result)) {
+        router.push("/dashboard");
+      }
+    } else {
+      // Use regular user login for citizens/verifiers
+      const result = await dispatch(loginUser({ email, password, rememberMe }));
+      if (loginUser.fulfilled.match(result)) {
+        router.push("/dashboard");
+      }
     }
   };
 
   return (
     <AuthLayout
-      title="Citizen Login"
+      title="Login Portal"
       subtitle="Access your welfare dashboard and tracking portal"
     >
       {error && (

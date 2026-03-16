@@ -3,7 +3,8 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 export interface IApplication extends Document {
   citizenId: mongoose.Types.ObjectId;
   schemeId: mongoose.Types.ObjectId;
-  status: 
+  status:
+    | "draft"
     | "submitted"
     | "under_review"
     | "verified"
@@ -13,9 +14,12 @@ export interface IApplication extends Document {
   assignedVerifier?: mongoose.Types.ObjectId;
   fraudScore?: number;
   vulnerabilityScore?: number;
-  appliedAt: Date;
+  appliedAt?: Date;
+  submittedAt?: Date;
   verifiedAt?: Date;
   adminApprovedAt?: Date;
+  draftData?: any; // Store draft form data
+  documents?: mongoose.Types.ObjectId[]; // References to ApplicationDocument
 }
 
 const ApplicationSchema = new Schema<IApplication>(
@@ -33,6 +37,7 @@ const ApplicationSchema = new Schema<IApplication>(
     status: {
       type: String,
       enum: [
+        "draft",
         "submitted",
         "under_review",
         "verified",
@@ -40,7 +45,7 @@ const ApplicationSchema = new Schema<IApplication>(
         "approved",
         "fraud_flagged",
       ],
-      default: "submitted",
+      default: "draft",
     },
     assignedVerifier: {
       type: Schema.Types.ObjectId,
@@ -48,9 +53,12 @@ const ApplicationSchema = new Schema<IApplication>(
     },
     fraudScore: { type: Number, default: 0 },
     vulnerabilityScore: { type: Number, default: 0 },
-    appliedAt: { type: Date, default: Date.now },
+    appliedAt: { type: Date },
+    submittedAt: { type: Date },
     verifiedAt: { type: Date },
     adminApprovedAt: { type: Date },
+    draftData: { type: Schema.Types.Mixed }, // Store draft form data
+    documents: [{ type: Schema.Types.ObjectId, ref: "ApplicationDocument" }],
   },
   { timestamps: true },
 );
