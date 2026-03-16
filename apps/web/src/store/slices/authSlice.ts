@@ -26,15 +26,17 @@ export const registerUser = createAsyncThunk(
   "auth/register",
   async (
     data: { name: string; email: string; password: string; role: string },
-    { rejectWithValue }
+    { rejectWithValue },
   ) => {
     try {
       const res = await api.post("/api/auth/register", data);
       return res.data.user;
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || "Registration failed");
+      return rejectWithValue(
+        err.response?.data?.message || "Registration failed",
+      );
     }
-  }
+  },
 );
 
 export const loginUser = createAsyncThunk(
@@ -46,7 +48,21 @@ export const loginUser = createAsyncThunk(
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || "Login failed");
     }
-  }
+  },
+);
+
+export const adminLogin = createAsyncThunk(
+  "auth/adminLogin",
+  async (data: { email: string; password: string }, { rejectWithValue }) => {
+    try {
+      const res = await api.post("/api/auth/admin-login", data);
+      return res.data.user;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.message || "Admin login failed",
+      );
+    }
+  },
 );
 
 export const logoutUser = createAsyncThunk(
@@ -57,7 +73,7 @@ export const logoutUser = createAsyncThunk(
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || "Logout failed");
     }
-  }
+  },
 );
 
 export const fetchCurrentUser = createAsyncThunk(
@@ -67,9 +83,11 @@ export const fetchCurrentUser = createAsyncThunk(
       const res = await api.get("/api/auth/me");
       return res.data.user;
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || "Not authenticated");
+      return rejectWithValue(
+        err.response?.data?.message || "Not authenticated",
+      );
     }
-  }
+  },
 );
 
 const authSlice = createSlice({
@@ -116,22 +134,40 @@ const authSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Logout
+    // Admin Login
     builder
-      .addCase(logoutUser.fulfilled, () => {
-        return initialState;
+      .addCase(adminLogin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(adminLogin.fulfilled, (state, action: PayloadAction<User>) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        state.user = action.payload;
+      })
+      .addCase(adminLogin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
+
+    // Logout
+    builder.addCase(logoutUser.fulfilled, () => {
+      return initialState;
+    });
 
     // Fetch current user
     builder
       .addCase(fetchCurrentUser.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchCurrentUser.fulfilled, (state, action: PayloadAction<User>) => {
-        state.loading = false;
-        state.isAuthenticated = true;
-        state.user = action.payload;
-      })
+      .addCase(
+        fetchCurrentUser.fulfilled,
+        (state, action: PayloadAction<User>) => {
+          state.loading = false;
+          state.isAuthenticated = true;
+          state.user = action.payload;
+        },
+      )
       .addCase(fetchCurrentUser.rejected, (state) => {
         state.loading = false;
         state.isAuthenticated = false;

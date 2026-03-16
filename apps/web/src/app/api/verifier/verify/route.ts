@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     if (!currentUser || currentUser.role !== "verifier") {
       return NextResponse.json(
         { success: false, message: "Unauthorized: Verifier access required" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -20,8 +20,11 @@ export async function POST(req: NextRequest) {
 
     if (!citizenProfileId || !["verified", "rejected"].includes(status)) {
       return NextResponse.json(
-        { success: false, message: "Provide citizenProfileId and status (verified/rejected)" },
-        { status: 400 }
+        {
+          success: false,
+          message: "Provide citizenProfileId and status (verified/rejected)",
+        },
+        { status: 400 },
       );
     }
 
@@ -29,7 +32,7 @@ export async function POST(req: NextRequest) {
     if (!citizenProfile) {
       return NextResponse.json(
         { success: false, message: "Citizen profile not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -38,8 +41,8 @@ export async function POST(req: NextRequest) {
 
     if (status === "verified") {
       await VerifierProfile.findOneAndUpdate(
-        { user: currentUser._id },
-        { $addToSet: { verifiedCitizens: citizenProfile.user } }
+        { userId: currentUser._id },
+        { $addToSet: { verifiedCitizens: citizenProfile.userId } },
       );
     }
 
@@ -51,7 +54,7 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     return NextResponse.json(
       { success: false, message: error.message || "Server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

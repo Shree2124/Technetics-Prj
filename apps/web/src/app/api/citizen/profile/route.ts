@@ -11,15 +11,15 @@ export async function GET() {
     if (!currentUser || currentUser.role !== "citizen") {
       return NextResponse.json(
         { success: false, message: "Unauthorized: Citizen access required" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
-    const profile = await CitizenProfile.findOne({ user: currentUser._id });
+    const profile = await CitizenProfile.findOne({ userId: currentUser._id });
     if (!profile) {
       return NextResponse.json(
         { success: false, message: "Profile not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -27,7 +27,7 @@ export async function GET() {
   } catch (error: any) {
     return NextResponse.json(
       { success: false, message: error.message || "Server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -40,7 +40,7 @@ export async function PUT(req: NextRequest) {
     if (!currentUser || currentUser.role !== "citizen") {
       return NextResponse.json(
         { success: false, message: "Unauthorized: Citizen access required" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -51,15 +51,15 @@ export async function PUT(req: NextRequest) {
     delete updates.user;
 
     const profile = await CitizenProfile.findOneAndUpdate(
-      { user: currentUser._id },
+      { userId: currentUser._id },
       updates,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!profile) {
       return NextResponse.json(
         { success: false, message: "Profile not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -67,7 +67,7 @@ export async function PUT(req: NextRequest) {
   } catch (error: any) {
     return NextResponse.json(
       { success: false, message: error.message || "Server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

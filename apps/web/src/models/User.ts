@@ -6,6 +6,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: "admin" | "verifier" | "citizen";
+  isVerified: boolean;
   profile?: mongoose.Types.ObjectId;
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;
@@ -35,6 +36,7 @@ const UserSchema = new Schema<IUser>(
       enum: ["admin", "verifier", "citizen"],
       default: "citizen",
     },
+    isVerified: { type: Boolean, default: false },
     profile: { type: Schema.Types.ObjectId, refPath: "profileModel" },
     resetPasswordToken: String,
     resetPasswordExpire: Date,

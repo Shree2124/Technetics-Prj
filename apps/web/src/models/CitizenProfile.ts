@@ -1,16 +1,29 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface ICitizenProfile extends Document {
-  user: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
   income: number;
-  employmentStatus: string;
-  familySize: number;
-  healthConditions: string[];
-  location: string;
-  housingType: string;
-  phoneNumber: string;
-  documents: string[];
-  vulnerabilityScore: number;
+  employment_status:
+    | "employed"
+    | "unemployed"
+    | "informal"
+    | "self_employed"
+    | "retired";
+  family_size: number;
+  education_level:
+    | "primary"
+    | "secondary"
+    | "graduate"
+    | "postgraduate"
+    | "none";
+  health_condition: boolean;
+  housing_type: "temporary" | "permanent" | "rented" | "homeless";
+  disaster_risk: "low" | "medium" | "high";
+  address: string;
+  district: string;
+  phoneNumber?: string;
+  documents?: string[];
+  vulnerabilityScore?: number;
   verificationStatus: "pending" | "verified" | "rejected";
   createdAt: Date;
   updatedAt: Date;
@@ -18,21 +31,37 @@ export interface ICitizenProfile extends Document {
 
 const CitizenProfileSchema = new Schema<ICitizenProfile>(
   {
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true, unique: true },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      unique: true,
+    },
     income: { type: Number, default: 0 },
-    employmentStatus: {
+    employment_status: {
       type: String,
-      enum: ["employed", "unemployed", "self-employed", "retired", "student"],
+      enum: ["employed", "unemployed", "informal", "self_employed", "retired"],
       default: "unemployed",
     },
-    familySize: { type: Number, default: 1 },
-    healthConditions: [{ type: String }],
-    location: { type: String, default: "" },
-    housingType: {
+    family_size: { type: Number, default: 1, min: 1 },
+    education_level: {
       type: String,
-      enum: ["owned", "rented", "homeless", "government", "other"],
-      default: "other",
+      enum: ["primary", "secondary", "graduate", "postgraduate", "none"],
+      default: "primary",
     },
+    health_condition: { type: Boolean, default: false },
+    housing_type: {
+      type: String,
+      enum: ["temporary", "permanent", "rented", "homeless"],
+      default: "temporary",
+    },
+    disaster_risk: {
+      type: String,
+      enum: ["low", "medium", "high"],
+      default: "medium",
+    },
+    address: { type: String, default: "" },
+    district: { type: String, default: "" },
     phoneNumber: { type: String, default: "" },
     documents: [{ type: String }],
     vulnerabilityScore: { type: Number, default: 0, min: 0, max: 100 },
@@ -42,7 +71,7 @@ const CitizenProfileSchema = new Schema<ICitizenProfile>(
       default: "pending",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const CitizenProfile: Model<ICitizenProfile> =

@@ -1,11 +1,11 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IVerifierProfile extends Document {
-  user: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
   department: string;
+  region: string;
   designation: string;
-  employeeId: string;
-  assignedRegion: string;
+  isActive: boolean;
   verifiedCitizens: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
@@ -13,14 +13,19 @@ export interface IVerifierProfile extends Document {
 
 const VerifierProfileSchema = new Schema<IVerifierProfile>(
   {
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true, unique: true },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      unique: true,
+    },
     department: { type: String, default: "" },
+    region: { type: String, default: "" },
     designation: { type: String, default: "" },
-    employeeId: { type: String, default: "" },
-    assignedRegion: { type: String, default: "" },
+    isActive: { type: Boolean, default: true },
     verifiedCitizens: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const VerifierProfile: Model<IVerifierProfile> =

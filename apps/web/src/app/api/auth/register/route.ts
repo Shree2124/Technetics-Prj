@@ -32,11 +32,11 @@ export async function POST(req: NextRequest) {
 
     // Create profile based on role
     if (userRole === "citizen") {
-      const profile = await CitizenProfile.create({ user: user._id });
+      const profile = await CitizenProfile.create({ userId: user._id });
       user.profile = profile._id as any;
       await user.save();
     } else if (userRole === "verifier") {
-      const profile = await VerifierProfile.create({ user: user._id });
+      const profile = await VerifierProfile.create({ userId: user._id });
       user.profile = profile._id as any;
       await user.save();
     }

@@ -4,7 +4,9 @@ import { useState, FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { loginUser, clearError } from "@/store/slices/authSlice";
+import { loginUser, adminLogin, clearError } from "@/store/slices/authSlice";
+
+const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -16,8 +18,17 @@ export default function LoginPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     dispatch(clearError());
-    const result = await dispatch(loginUser({ email, password }));
-    if (loginUser.fulfilled.match(result)) {
+
+    const isAdmin = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    const action = isAdmin
+      ? adminLogin({ email, password })
+      : loginUser({ email, password });
+
+    const result = await dispatch(action);
+    if (
+      adminLogin.fulfilled.match(result) ||
+      loginUser.fulfilled.match(result)
+    ) {
       router.push("/dashboard");
     }
   };
@@ -29,12 +40,16 @@ export default function LoginPage() {
         <p className="mb-8 text-sm text-zinc-500">Sign in to your account</p>
 
         {error && (
-          <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>
+          <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+            {error}
+          </div>
         )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-zinc-700">Email</label>
+            <label className="mb-1 block text-sm font-medium text-zinc-700">
+              Email
+            </label>
             <input
               type="email"
               value={email}
@@ -46,7 +61,9 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-zinc-700">Password</label>
+            <label className="mb-1 block text-sm font-medium text-zinc-700">
+              Password
+            </label>
             <input
               type="password"
               value={password}
@@ -58,7 +75,10 @@ export default function LoginPage() {
           </div>
 
           <div className="flex justify-end">
-            <Link href="/forgot-password" className="text-sm text-zinc-500 hover:text-zinc-700">
+            <Link
+              href="/forgot-password"
+              className="text-sm text-zinc-500 hover:text-zinc-700"
+            >
               Forgot password?
             </Link>
           </div>
@@ -74,7 +94,10 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-zinc-500">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="font-medium text-zinc-900 hover:underline">
+          <Link
+            href="/register"
+            className="font-medium text-zinc-900 hover:underline"
+          >
             Register
           </Link>
         </p>
