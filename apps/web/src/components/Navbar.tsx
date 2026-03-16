@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logoutUser } from "@/store/slices/authSlice";
 import { useRouter } from "next/navigation";
@@ -46,14 +47,20 @@ export default function Navbar() {
 
         {/* Branding */}
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-7 flex-col items-center justify-center rounded bg-gov-dark-blue text-[9px] font-bold text-white">
-            GOI
-          </div>
           <Link
             href={isAuthenticated ? "/dashboard" : "/"}
-            className="text-base font-bold text-gov-dark-blue tracking-tight hidden sm:block"
+            className="flex items-center gap-2"
           >
-            Welfare Portal
+            <Image
+              src="/WelfAilogo.png"
+              alt="WelfAI Logo"
+              width={32}
+              height={32}
+              className="object-contain"
+            />
+            <span className="text-base font-bold text-gov-dark-blue tracking-tight hidden sm:block">
+              WelfAI
+            </span>
           </Link>
         </div>
       </div>
