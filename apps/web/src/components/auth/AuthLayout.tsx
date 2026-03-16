@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import TopBar from "../landing/TopBar";
 import Footer from "../landing/Footer";
@@ -13,14 +14,18 @@ export default function AuthLayout({ children, title, subtitle }: { children: Re
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           {/* Logo & Branding */}
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-8 flex-col items-center justify-center rounded bg-gov-light-gray text-[10px] font-bold text-gov-dark-blue">
-              <span>GOI</span>
-            </div>
-            <div>
-              <Link href="/" className="text-lg font-bold text-gov-dark-blue hover:text-gov-mid-blue transition-colors">
-                Welfare Portal
-              </Link>
-            </div>
+            <Link href="/" className="flex items-center gap-2.5">
+              <Image
+                src="/WelfAilogo.png"
+                alt="WelfAI Logo"
+                width={36}
+                height={36}
+                className="object-contain"
+              />
+              <span className="text-lg font-bold text-gov-dark-blue hover:text-gov-mid-blue transition-colors">
+                WelfAI
+              </span>
+            </Link>
           </div>
 
           {/* Back Button */}
@@ -37,11 +42,17 @@ export default function AuthLayout({ children, title, subtitle }: { children: Re
           {/* Government Branding Side Panel */}
           <div className="hidden w-2/5 flex-col justify-between bg-gov-dark-blue p-8 text-white md:flex">
             <div>
-              <div className="mb-8 inline-flex h-16 w-12 items-center justify-center rounded bg-white/10 text-xl font-bold">
-                GOI
+              <div className="mb-8">
+                <Image
+                  src="/WelfAilogo.png"
+                  alt="WelfAI Logo"
+                  width={64}
+                  height={64}
+                  className="object-contain brightness-0 invert"
+                />
               </div>
               <h2 className="text-2xl font-bold leading-tight">
-                National Citizen Welfare Portal
+                WelfAI — Citizen Welfare Portal
               </h2>
               <p className="mt-4 text-sm text-gov-light-blue leading-relaxed">
                 A secure, unified platform for accessing government services, benefits, and tracking schematic applications.

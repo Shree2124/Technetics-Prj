@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "../ui/Button";
 import { Search } from "lucide-react";
 
@@ -7,19 +8,23 @@ export default function Header() {
     <header className="border-b border-gray-200 bg-white shadow-sm">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-y-4 px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4">
-          {/* Enhanced State Emblem Placeholder */}
-          <div className="flex h-14 w-11 flex-col items-center justify-center rounded-sm bg-gradient-to-b from-gov-light-blue/20 to-gov-light-gray border border-gov-mid-blue/20 text-xs font-bold text-gov-dark-blue shadow-inner">
-            <span className="text-[10px]">सत्यमेव</span>
-            <span>GOI</span>
-          </div>
-          <div>
-            <Link href="/" className="text-xl font-bold text-gov-dark-blue sm:text-2xl tracking-tight">
-              WelfareApp
-            </Link>
-            <p className="text-xs font-medium text-gov-slate sm:text-sm">
-              Ministry of Citizen Services
-            </p>
-          </div>
+          <Link href="/" className="flex items-center gap-3">
+            <Image
+              src="/WelfAilogo.png"
+              alt="WelfAI Logo"
+              width={44}
+              height={44}
+              className="object-contain"
+            />
+            <div>
+              <span className="text-xl font-bold text-gov-dark-blue sm:text-2xl tracking-tight">
+                WelfAI
+              </span>
+              <p className="text-xs font-medium text-gov-slate sm:text-sm">
+                AI-Powered Welfare Platform
+              </p>
+            </div>
+          </Link>
         </div>
 
         {/* Search Bar */}

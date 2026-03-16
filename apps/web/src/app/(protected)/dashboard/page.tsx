@@ -201,16 +201,57 @@ function CitizenDashboard() {
   );
 }
 
-/* ─── ADMIN DASHBOARD (kept from before) ─────────────────────────── */
+/* ─── ADMIN DASHBOARD ─────────────────────────────────────────────── */
 
 function AdminDashboard() {
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get("/api/admin/stats")
+      .then((res) => setStats(res.data.stats))
+      .catch((err) => console.error("Failed to load admin stats", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-gov-mid-blue border-t-transparent" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Total Citizens" value="1.24M" icon={<Users className="h-5 w-5" />} color="text-blue-600 bg-blue-50" />
-        <StatCard title="Active Schemes" value="48" icon={<Activity className="h-5 w-5" />} color="text-green-600 bg-green-50" />
-        <StatCard title="Pending Requests" value="3,429" icon={<FileText className="h-5 w-5" />} color="text-amber-600 bg-amber-50" />
-        <StatCard title="Funds Disbursed" value="₹450Cr" icon={<CreditCard className="h-5 w-5" />} color="text-purple-600 bg-purple-50" />
+        <StatCard title="Total Citizens" value={stats?.totalCitizens?.toLocaleString() || "0"} icon={<Users className="h-5 w-5" />} color="text-blue-600 bg-blue-50" />
+        <StatCard title="Active Schemes" value={stats?.activeSchemes?.toString() || "0"} icon={<Activity className="h-5 w-5" />} color="text-green-600 bg-green-50" />
+        <StatCard title="Total Applications" value={stats?.totalApplications?.toLocaleString() || "0"} icon={<FileText className="h-5 w-5" />} color="text-amber-600 bg-amber-50" />
+        <StatCard title="Approved" value={stats?.approvedCount?.toString() || "0"} icon={<CheckCircle className="h-5 w-5" />} color="text-emerald-600 bg-emerald-50" />
+      </div>
+
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-3">
+        <StatCard title="Pending" value={stats?.pendingCount?.toString() || "0"} icon={<Clock className="h-5 w-5" />} color="text-amber-600 bg-amber-50" />
+        <StatCard title="Rejected" value={stats?.rejectedCount?.toString() || "0"} icon={<AlertTriangle className="h-5 w-5" />} color="text-red-600 bg-red-50" />
+        <StatCard title="Fraud Flagged" value={stats?.flaggedCount?.toString() || "0"} icon={<ShieldCheck className="h-5 w-5" />} color="text-rose-600 bg-rose-50" />
+      </div>
+
+      {/* Quick Access */}
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-bold text-gov-dark-blue">Scheme Applications</h2>
+          <p className="text-sm text-gray-500 mt-1">
+            {stats?.pendingCount || 0} pending + {stats?.underReviewCount || 0} under review applications need your attention.
+          </p>
+        </div>
+        <Link
+          href="/admin/applications"
+          className="rounded-lg bg-gov-dark-blue px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gov-dark-blue/90 flex items-center gap-2 shrink-0"
+        >
+          View All Applications
+          <ArrowRight className="h-4 w-4" />
+        </Link>
       </div>
     </div>
   );
