@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import vulnerability
+from routes import vulnerability, fraud, recommendation
 
 app = FastAPI(
     title="AI Welfare Allocation Service",
@@ -7,6 +7,8 @@ app = FastAPI(
 )
 
 app.include_router(vulnerability.router)
+app.include_router(fraud.router)
+app.include_router(recommendation.router)
 
 
 @app.get("/")

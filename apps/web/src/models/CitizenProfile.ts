@@ -33,16 +33,16 @@ const CitizenProfileSchema = new Schema<ICitizenProfile>(
       required: true,
       unique: true,
     },
-    fullName: { type: String, required: true },
-    aadhaarNumber: { type: String, required: true, unique: true },
-    phone: { type: String, required: true },
-    age: { type: Number, required: true },
-    gender: { type: String, required: true },
+    fullName: { type: String },
+    aadhaarNumber: { type: String, unique: true },
+    phone: { type: String },
+    age: { type: Number },
+    gender: { type: String },
     address: {
-      state: { type: String, required: true },
-      district: { type: String, required: true },
-      village: { type: String, required: true },
-      pincode: { type: String, required: true },
+      state: { type: String },
+      district: { type: String },
+      village: { type: String },
+      pincode: { type: String },
     },
     ruralFlag: { type: Boolean, default: false },
     income: { type: Number, default: 0 },
@@ -62,7 +62,9 @@ if (mongoose.models.CitizenProfile) {
   delete mongoose.models.CitizenProfile;
 }
 
-const CitizenProfile: Model<ICitizenProfile> =
-  mongoose.model<ICitizenProfile>("CitizenProfile", CitizenProfileSchema);
+const CitizenProfile: Model<ICitizenProfile> = mongoose.model<ICitizenProfile>(
+  "CitizenProfile",
+  CitizenProfileSchema,
+);
 
 export default CitizenProfile;

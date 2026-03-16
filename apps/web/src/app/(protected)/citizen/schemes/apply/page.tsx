@@ -16,7 +16,12 @@ import {
 import Link from "next/link";
 import api from "@/lib/axios";
 
-const steps = ["Personal Details", "Documents", "Review & Submit"];
+const steps = [
+  "Personal Details",
+  "Documents",
+  "AI Analysis & Review",
+  "Submit",
+];
 
 export default function ApplyPage() {
   const searchParams = useSearchParams();
@@ -32,6 +37,7 @@ export default function ApplyPage() {
   const [draftSaved, setDraftSaved] = useState(false);
   const [scheme, setScheme] = useState<any>(null);
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
+  const [aiResults, setAiResults] = useState<any>(null);
 
   const [form, setForm] = useState({
     fullName: "",
@@ -54,6 +60,8 @@ export default function ApplyPage() {
     disability: false,
     propertyOwned: "",
     bankAccount: "",
+    housing_type: "",
+    disaster_risk: "",
     declaration: false,
   });
 
@@ -225,7 +233,7 @@ export default function ApplyPage() {
     }
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (currentStep === 0) {
       // Validate personal details
       if (
@@ -239,6 +247,33 @@ export default function ApplyPage() {
         return;
       }
     }
+
+    // AI Analysis Step
+    if (currentStep === 1) {
+      // Moving from Documents to AI Analysis
+      setLoading(true);
+      setError("");
+      try {
+        const aiData = {
+          income: parseFloat(form.income) || 0,
+          employment_status: form.employmentStatus || "unemployed",
+          family_size: parseInt(form.familySize) || 1,
+          education_level: form.educationLevel || "primary",
+          health_condition: form.healthCondition ? 1 : 0,
+          housing_type: form.housing_type || "temporary",
+          disaster_risk: form.disaster_risk || "low",
+        };
+
+        const response = await api.post("/api/citizen/ai-analysis", aiData);
+        setAiResults(response.data);
+      } catch (err: any) {
+        setError(err.response?.data?.message || "Failed to get AI analysis.");
+        setLoading(false);
+        return; // Stop if AI analysis fails
+      }
+      setLoading(false);
+    }
+
     if (currentStep < steps.length - 1) setCurrentStep((s) => s + 1);
   };
 
@@ -290,7 +325,45 @@ export default function ApplyPage() {
         <h1 className="text-xl md:text-2xl font-bold text-gov-dark-blue">
           Apply: {schemeName}
         </h1>
+        {scheme && !scheme.isEligible && (
+          <div className="mt-2 rounded-lg bg-amber-50 border border-amber-200 p-3">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-amber-800">
+                  You may not be eligible for this scheme
+                </p>
+                <ul className="text-xs text-amber-700 mt-1 list-disc list-inside">
+                  {scheme.eligibilityReasons?.map(
+                    (reason: string, i: number) => (
+                      <li key={i}>{reason}</li>
+                    ),
+                  )}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Alerts */}
+      {error && (
+        <div className="rounded-lg bg-red-50 border border-red-200 p-4">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+            <p className="text-sm text-red-800">{error}</p>
+          </div>
+        </div>
+      )}
+
+      {success && (
+        <div className="rounded-lg bg-green-50 border border-green-200 p-4">
+          <div className="flex items-start gap-2">
+            <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+            <p className="text-sm text-green-800">{success}</p>
+          </div>
+        </div>
+      )}
 
       {/* Progress Bar */}
       <div className="flex items-center gap-2">
@@ -319,6 +392,18 @@ export default function ApplyPage() {
         ))}
       </div>
 
+      {/* Draft Save Button */}
+      <div className="flex justify-end">
+        <button
+          onClick={saveDraft}
+          disabled={loading || draftSaved}
+          className="flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          <Save className="h-4 w-4" />
+          {draftSaved ? "Draft Saved" : "Save Draft"}
+        </button>
+      </div>
+
       {/* Step Content */}
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6">
         {currentStep === 0 && (
@@ -332,7 +417,7 @@ export default function ApplyPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gov-dark-blue">
-                  Full Name
+                  Full Name *
                 </label>
                 <input
                   type="text"
@@ -344,20 +429,20 @@ export default function ApplyPage() {
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gov-dark-blue">
-                  Aadhaar Number
+                  Aadhaar Number *
                 </label>
                 <input
                   type="text"
-                  value={form.aadhaar}
-                  onChange={(e) => updateForm("aadhaar", e.target.value)}
+                  value={form.aadhaarNumber}
+                  onChange={(e) => updateForm("aadhaarNumber", e.target.value)}
                   placeholder="XXXX-XXXX-XXXX"
-                  maxLength={14}
+                  maxLength={12}
                   className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gov-mid-blue/40 focus:border-gov-mid-blue"
                 />
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gov-dark-blue">
-                  Phone Number
+                  Phone Number *
                 </label>
                 <input
                   type="tel"
@@ -366,6 +451,33 @@ export default function ApplyPage() {
                   placeholder="+91 XXXXX XXXXX"
                   className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gov-mid-blue/40 focus:border-gov-mid-blue"
                 />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gov-dark-blue">
+                  Age *
+                </label>
+                <input
+                  type="number"
+                  value={form.age}
+                  onChange={(e) => updateForm("age", e.target.value)}
+                  placeholder="e.g. 25"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gov-mid-blue/40 focus:border-gov-mid-blue"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gov-dark-blue">
+                  Gender *
+                </label>
+                <select
+                  value={form.gender}
+                  onChange={(e) => updateForm("gender", e.target.value)}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gov-mid-blue/40 focus:border-gov-mid-blue"
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gov-dark-blue">
@@ -391,18 +503,123 @@ export default function ApplyPage() {
                   className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gov-mid-blue/40 focus:border-gov-mid-blue"
                 />
               </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gov-dark-blue">
+                  Employment Status
+                </label>
+                <select
+                  value={form.employmentStatus}
+                  onChange={(e) =>
+                    updateForm("employmentStatus", e.target.value)
+                  }
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gov-mid-blue/40 focus:border-gov-mid-blue"
+                >
+                  <option value="">Select Status</option>
+                  <option value="employed">Employed</option>
+                  <option value="unemployed">Unemployed</option>
+                  <option value="self_employed">Self Employed</option>
+                  <option value="retired">Retired</option>
+                </select>
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gov-dark-blue">
+                  Housing Type
+                </label>
+                <select
+                  value={form.housing_type}
+                  onChange={(e) => updateForm("housing_type", e.target.value)}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gov-mid-blue/40 focus:border-gov-mid-blue"
+                >
+                  <option value="">Select Housing Type</option>
+                  <option value="owned">Owned</option>
+                  <option value="rented">Rented</option>
+                  <option value="temporary">Temporary</option>
+                </select>
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gov-dark-blue">
+                  Disaster Risk Area
+                </label>
+                <select
+                  value={form.disaster_risk}
+                  onChange={(e) => updateForm("disaster_risk", e.target.value)}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gov-mid-blue/40 focus:border-gov-mid-blue"
+                >
+                  <option value="">Select Disaster Risk</option>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gov-dark-blue">
-                Address
-              </label>
-              <textarea
-                value={form.address}
-                onChange={(e) => updateForm("address", e.target.value)}
-                rows={2}
-                placeholder="Full residential address"
-                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gov-mid-blue/40 focus:border-gov-mid-blue resize-none"
-              />
+
+            {/* Address Fields */}
+            <div className="border-t border-gray-100 pt-4">
+              <h3 className="text-sm font-semibold text-gov-dark-blue mb-3">
+                Address Details *
+              </h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gov-dark-blue">
+                    State
+                  </label>
+                  <input
+                    type="text"
+                    value={form.address.state}
+                    onChange={(e) => updateAddress("state", e.target.value)}
+                    placeholder="Enter state"
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gov-mid-blue/40 focus:border-gov-mid-blue"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gov-dark-blue">
+                    District
+                  </label>
+                  <input
+                    type="text"
+                    value={form.address.district}
+                    onChange={(e) => updateAddress("district", e.target.value)}
+                    placeholder="Enter district"
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gov-mid-blue/40 focus:border-gov-mid-blue"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gov-dark-blue">
+                    Village/City
+                  </label>
+                  <input
+                    type="text"
+                    value={form.address.village}
+                    onChange={(e) => updateAddress("village", e.target.value)}
+                    placeholder="Enter village or city"
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gov-mid-blue/40 focus:border-gov-mid-blue"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gov-dark-blue">
+                    Pincode
+                  </label>
+                  <input
+                    type="text"
+                    value={form.address.pincode}
+                    onChange={(e) => updateAddress("pincode", e.target.value)}
+                    placeholder="Enter pincode"
+                    maxLength={6}
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gov-mid-blue/40 focus:border-gov-mid-blue"
+                  />
+                </div>
+              </div>
+              <div className="mt-3">
+                <label className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={form.ruralFlag}
+                    onChange={(e) => updateForm("ruralFlag", e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 text-gov-dark-blue focus:ring-gov-mid-blue"
+                  />
+                  <span className="text-sm text-gray-700">Rural Area</span>
+                </label>
+              </div>
             </div>
           </div>
         )}
@@ -414,38 +631,150 @@ export default function ApplyPage() {
               <h2 className="text-base font-semibold">Required Documents</h2>
             </div>
             <p className="text-sm text-gray-500">
-              Select the documents you can provide. These will be verified by
-              the department.
+              Upload documents in PDF, JPG, or PNG format (Max size: 5MB)
             </p>
-            <div className="space-y-3">
+
+            <div className="space-y-4">
               {[
-                { key: "hasAadhaar", label: "Aadhaar Card" },
-                { key: "hasIncomeCert", label: "Income Certificate" },
-                { key: "hasRationCard", label: "Ration Card" },
-                { key: "hasBankPassbook", label: "Bank Passbook / Statement" },
-                { key: "hasDomicile", label: "Domicile Certificate" },
-              ].map(({ key, label }) => (
-                <label
+                { key: "aadhaar", label: "Aadhaar Card", required: true },
+                {
+                  key: "income_certificate",
+                  label: "Income Certificate",
+                  required: false,
+                },
+                { key: "ration_card", label: "Ration Card", required: false },
+                {
+                  key: "property_document",
+                  label: "Property Document",
+                  required: false,
+                },
+                {
+                  key: "medical_certificate",
+                  label: "Medical Certificate",
+                  required: false,
+                },
+              ].map(({ key, label, required }) => (
+                <div
                   key={key}
-                  className="flex items-center gap-3 rounded-lg border border-gray-200 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                  className="border border-gray-200 rounded-lg p-4"
                 >
-                  <input
-                    type="checkbox"
-                    checked={form[key as keyof typeof form] as boolean}
-                    onChange={(e) => updateForm(key, e.target.checked)}
-                    className="h-4 w-4 rounded border-gray-300 text-gov-dark-blue focus:ring-gov-mid-blue"
-                  />
-                  <FileText className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm text-gray-700 font-medium">
-                    {label}
-                  </span>
-                </label>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-gray-400" />
+                      <span className="text-sm font-medium text-gray-700">
+                        {label}{" "}
+                        {required && <span className="text-red-500">*</span>}
+                      </span>
+                    </div>
+                    {uploadedFiles.find((f) => f.documentType === key) ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-green-600">Uploaded</span>
+                        <button
+                          onClick={() =>
+                            removeFile(
+                              uploadedFiles.find((f) => f.documentType === key)
+                                ?.id || "",
+                            )
+                          }
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <label className="cursor-pointer">
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={(e) => handleFileUpload(e, key)}
+                          className="hidden"
+                          disabled={loading}
+                        />
+                        <span className="text-xs text-gov-mid-blue hover:text-gov-dark-blue font-medium">
+                          Choose File
+                        </span>
+                      </label>
+                    )}
+                  </div>
+                  {uploadedFiles.find((f) => f.documentType === key) && (
+                    <div className="text-xs text-gray-500">
+                      Uploaded:{" "}
+                      {new Date(
+                        uploadedFiles.find((f) => f.documentType === key)
+                          ?.uploadedAt || "",
+                      ).toLocaleString()}
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           </div>
         )}
 
-        {currentStep === 2 && (
+        {currentStep === 2 && aiResults && (
+          <div className="space-y-5">
+            <div className="flex items-center gap-2 mb-4 text-gov-dark-blue">
+              <CheckCircle className="h-5 w-5" />
+              <h2 className="text-base font-semibold">AI Analysis & Review</h2>
+            </div>
+
+            {/* Vulnerability Score */}
+            <div className="rounded-lg bg-gray-50 border border-gray-100 p-4">
+              <h3 className="text-sm font-semibold text-gov-dark-blue mb-2">
+                Vulnerability Score
+              </h3>
+              <p className="text-2xl font-bold text-gov-dark-blue">
+                {aiResults.vulnerability.vulnerability_score.toFixed(2)}
+              </p>
+              <p
+                className={`text-sm font-medium ${aiResults.vulnerability.priority_level === "high" ? "text-red-600" : aiResults.vulnerability.priority_level === "medium" ? "text-amber-600" : "text-green-600"}`}
+              >
+                Priority Level: {aiResults.vulnerability.priority_level}
+              </p>
+            </div>
+
+            {/* Fraud Detection */}
+            <div className="rounded-lg bg-gray-50 border border-gray-100 p-4">
+              <h3 className="text-sm font-semibold text-gov-dark-blue mb-2">
+                Fraud Risk
+              </h3>
+              <p
+                className={`text-2xl font-bold ${aiResults.fraud.fraud_score > 0.5 ? "text-red-600" : "text-green-600"}`}
+              >
+                {aiResults.fraud.fraud_score > 0.5 ? "High Risk" : "Low Risk"}
+              </p>
+              {aiResults.fraud.reasons.length > 0 && (
+                <ul className="text-xs text-red-700 mt-1 list-disc list-inside">
+                  {aiResults.fraud.reasons.map((reason: string, i: number) => (
+                    <li key={i}>{reason}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Scheme Recommendations */}
+            <div className="rounded-lg bg-gray-50 border border-gray-100 p-4">
+              <h3 className="text-sm font-semibold text-gov-dark-blue mb-2">
+                Recommended Schemes
+              </h3>
+              <div className="space-y-2">
+                {aiResults.recommendations.map((rec: any) => (
+                  <div
+                    key={rec.scheme_id}
+                    className="p-2 border-b border-gray-200"
+                  >
+                    <p className="font-medium text-sm">{rec.scheme_name}</p>
+                    <p className="text-xs text-green-600">
+                      Matching Score: {rec.matching_score}%
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentStep === 3 && (
           <div className="space-y-5">
             <div className="flex items-center gap-2 mb-4 text-gov-dark-blue">
               <CheckCircle className="h-5 w-5" />
@@ -467,11 +796,19 @@ export default function ApplyPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Aadhaar</span>
-                <span className="font-medium">{form.aadhaar || "—"}</span>
+                <span className="font-medium">{form.aadhaarNumber || "—"}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Phone</span>
                 <span className="font-medium">{form.phone || "—"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Age</span>
+                <span className="font-medium">{form.age || "—"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Gender</span>
+                <span className="font-medium">{form.gender || "—"}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Annual Income</span>
@@ -479,40 +816,35 @@ export default function ApplyPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Family Size</span>
-                <span className="font-medium">{form.familySize}</span>
+                <span className="font-medium">{form.familySize || "—"}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Address</span>
                 <span className="font-medium text-right max-w-[50%]">
-                  {form.address || "—"}
+                  {[
+                    form.address.village,
+                    form.address.district,
+                    form.address.state,
+                    form.address.pincode,
+                  ]
+                    .filter(Boolean)
+                    .join(", ") || "—"}
                 </span>
               </div>
               <div className="border-t border-gray-200 pt-3">
                 <span className="text-gray-500 block mb-1">Documents</span>
                 <div className="flex flex-wrap gap-2">
-                  {form.hasAadhaar && (
-                    <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-                      Aadhaar
+                  {uploadedFiles.map((file) => (
+                    <span
+                      key={file.id}
+                      className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium"
+                    >
+                      {file.documentType.replace("_", " ")}
                     </span>
-                  )}
-                  {form.hasIncomeCert && (
-                    <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-                      Income Cert
-                    </span>
-                  )}
-                  {form.hasRationCard && (
-                    <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-                      Ration Card
-                    </span>
-                  )}
-                  {form.hasBankPassbook && (
-                    <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-                      Bank Passbook
-                    </span>
-                  )}
-                  {form.hasDomicile && (
-                    <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-                      Domicile
+                  ))}
+                  {uploadedFiles.length === 0 && (
+                    <span className="text-gray-400 text-xs">
+                      No documents uploaded
                     </span>
                   )}
                 </div>
@@ -548,17 +880,20 @@ export default function ApplyPage() {
           {currentStep < steps.length - 1 ? (
             <button
               onClick={nextStep}
-              className="flex items-center gap-2 rounded-lg bg-gov-dark-blue px-5 py-2.5 text-sm font-medium text-white hover:bg-gov-dark-blue/90 transition-colors"
+              disabled={loading}
+              className="flex items-center gap-2 rounded-lg bg-gov-dark-blue px-5 py-2.5 text-sm font-medium text-white hover:bg-gov-dark-blue/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Next <ArrowRight className="h-4 w-4" />
+              {loading ? "Analyzing..." : "Next"}{" "}
+              <ArrowRight className="h-4 w-4" />
             </button>
           ) : (
             <button
               onClick={handleSubmit}
-              disabled={!form.declaration}
+              disabled={!form.declaration || loading}
               className="flex items-center gap-2 rounded-lg bg-green-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              <CheckCircle className="h-4 w-4" /> Submit Application
+              <CheckCircle className="h-4 w-4" />{" "}
+              {loading ? "Submitting..." : "Submit Application"}
             </button>
           )}
         </div>
