@@ -11,6 +11,7 @@ import {
 
 const adminLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/applications", label: "Scheme Applications", icon: FileText },
   { href: "/admin/users", label: "Manage Staff", icon: Users },
   { href: "/admin/citizens", label: "Manage Citizens", icon: Shield },
 ];
