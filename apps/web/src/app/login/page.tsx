@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -12,25 +12,25 @@ import { Button } from "@/components/ui/Button";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { loading, error } = useAppSelector((state) => state.auth);
   const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL!;
 
+  useEffect(() => {
+    // Intentionally left blank or can be removed.
+    // We are no longer using localStorage for the email, as we now use session vs persistent cookies.
+  }, []);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     dispatch(clearError());
 
-    const isAdmin = email.toLowerCase() === ADMIN_EMAIL?.toLowerCase();
-    const action = isAdmin
-      ? adminLogin({ email, password })
-      : loginUser({ email, password });
-
-    const result = await dispatch(action);
-    if (
-      adminLogin.fulfilled.match(result) ||
-      loginUser.fulfilled.match(result)
-    ) {
+    // Pass rememberMe to the auth slice so it tells the backend to set a persistent cookie
+    const result = await dispatch(loginUser({ email, password, rememberMe }));
+    if (loginUser.fulfilled.match(result)) {
       router.push("/dashboard");
     }
   };
@@ -82,7 +82,24 @@ export default function LoginPage() {
           placeholder="••••••••"
         />
 
-        <div className="flex justify-end mt-1 mb-2">
+        <div className="flex items-center justify-between mt-1 mb-2">
+          <div className="flex items-center">
+            <input
+              id="remember-me"
+              name="remember-me"
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-gov-dark-blue focus:ring-gov-mid-blue"
+            />
+            <label
+              htmlFor="remember-me"
+              className="ml-2 block text-sm text-gray-700 font-medium"
+            >
+              Remember me
+            </label>
+          </div>
+
           <Link
             href="/forgot-password"
             className="text-sm font-medium text-gov-mid-blue hover:text-gov-dark-blue"

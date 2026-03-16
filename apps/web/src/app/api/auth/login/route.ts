@@ -6,7 +6,7 @@ import { generateToken, setAuthCookie } from "@/lib/auth";
 export async function POST(req: NextRequest) {
   try {
     await dbConnect();
-    const { email, password } = await req.json();
+    const { email, password, remember = false } = await req.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     }
 
     const token = generateToken(String(user._id), user.role);
-    await setAuthCookie(token);
+    await setAuthCookie(token, remember);
 
     return NextResponse.json({
       success: true,

@@ -8,27 +8,27 @@ export default function AuthLayout({ children, title, subtitle }: { children: Re
     <div className="flex min-h-screen flex-col bg-gov-light-gray relative">
       <TopBar />
       
-      {/* Back Button (Standard Flow) */}
-      <div className="bg-white px-4 md:px-8 py-2 border-b border-gray-100 flex items-center shadow-sm">
-        <Link href="/" className="inline-flex items-center text-sm font-medium text-gov-dark-blue hover:text-gov-mid-blue transition-colors rounded-full hover:bg-gov-dark-blue/5">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Home
-        </Link>
-      </div>
-      
-      {/* Compact Header for Auth Pages */}
-      <header className="border-b border-gray-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center px-4 py-3 sm:px-6 lg:px-8">
+      {/* Header for Auth Pages */}
+      <header className="border-b border-gray-200 bg-white shadow-sm z-10 relative">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+          {/* Logo & Branding */}
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-8 flex-col items-center justify-center rounded bg-gov-light-gray text-[10px] font-bold text-gov-dark-blue">
               <span>GOI</span>
             </div>
             <div>
               <Link href="/" className="text-lg font-bold text-gov-dark-blue hover:text-gov-mid-blue transition-colors">
-                WelfareApp
+                Welfare Portal
               </Link>
             </div>
           </div>
+
+          {/* Back Button */}
+          <Link href="/" className="inline-flex items-center text-sm font-medium text-gov-dark-blue hover:text-gov-mid-blue transition-colors rounded-full hover:bg-gov-dark-blue/5 px-3 py-1.5 border border-transparent hover:border-gov-light-gray">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            <span className="hidden sm:inline">Back to Home</span>
+            <span className="sm:hidden">Back</span>
+          </Link>
         </div>
       </header>
 
