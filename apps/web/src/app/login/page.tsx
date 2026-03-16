@@ -4,9 +4,10 @@ import { useState, FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { loginUser, adminLogin, clearError } from "@/store/slices/authSlice";
-
-const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "";
+import { loginUser, clearError, adminLogin } from "@/store/slices/authSlice";
+import AuthLayout from "@/components/auth/AuthLayout";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,12 +15,13 @@ export default function LoginPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { loading, error } = useAppSelector((state) => state.auth);
+  const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL!;
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     dispatch(clearError());
 
-    const isAdmin = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    const isAdmin = email.toLowerCase() === ADMIN_EMAIL?.toLowerCase();
     const action = isAdmin
       ? adminLogin({ email, password })
       : loginUser({ email, password });
@@ -34,74 +36,80 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm">
-        <h1 className="mb-2 text-2xl font-bold text-zinc-900">Welcome back</h1>
-        <p className="mb-8 text-sm text-zinc-500">Sign in to your account</p>
-
-        {error && (
-          <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
-            {error}
+    <AuthLayout
+      title="Citizen Login"
+      subtitle="Access your welfare dashboard and tracking portal"
+    >
+      {error && (
+        <div className="mb-6 rounded-md bg-red-50 p-4 border-l-4 border-red-500">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg
+                className="h-5 w-5 text-red-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-red-800">{error}</p>
+            </div>
           </div>
-        )}
+        </div>
+      )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-zinc-700">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
-              placeholder="you@example.com"
-            />
-          </div>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <Input
+          label="Email Address"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          placeholder="citizen@example.com"
+        />
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-zinc-700">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
-              placeholder="••••••••"
-            />
-          </div>
+        <Input
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          placeholder="••••••••"
+        />
 
-          <div className="flex justify-end">
-            <Link
-              href="/forgot-password"
-              className="text-sm text-zinc-500 hover:text-zinc-700"
-            >
-              Forgot password?
-            </Link>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="rounded-lg bg-zinc-900 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50"
-          >
-            {loading ? "Signing in..." : "Sign in"}
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-sm text-zinc-500">
-          Don&apos;t have an account?{" "}
+        <div className="flex justify-end mt-1 mb-2">
           <Link
-            href="/register"
-            className="font-medium text-zinc-900 hover:underline"
+            href="/forgot-password"
+            className="text-sm font-medium text-gov-mid-blue hover:text-gov-dark-blue"
           >
-            Register
+            Forgot password?
           </Link>
-        </p>
+        </div>
+
+        <Button
+          type="submit"
+          disabled={loading}
+          size="lg"
+          className="w-full mt-2"
+        >
+          {loading ? "Authenticating..." : "Login to Portal"}
+        </Button>
+      </form>
+
+      <div className="mt-8 border-t border-gray-200 pt-6 text-center text-sm text-gray-600">
+        New user?{" "}
+        <Link
+          href="/register"
+          className="font-semibold text-gov-mid-blue hover:text-gov-dark-blue"
+        >
+          Register for an account
+        </Link>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

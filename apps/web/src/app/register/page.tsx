@@ -5,6 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { registerUser, clearError } from "@/store/slices/authSlice";
+import AuthLayout from "@/components/auth/AuthLayout";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { Button } from "@/components/ui/Button";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -25,82 +29,81 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm">
-        <h1 className="mb-2 text-2xl font-bold text-zinc-900">Create account</h1>
-        <p className="mb-8 text-sm text-zinc-500">Register for a new account</p>
-
-        {error && (
-          <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>
-        )}
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-zinc-700">Full Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
-              placeholder="John Doe"
-            />
+    <AuthLayout 
+      title="Create Citizen Account" 
+      subtitle="Register to access your welfare dashboard and tracking portal"
+    >
+      {error && (
+        <div className="mb-6 rounded-md bg-red-50 p-4 border-l-4 border-red-500">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-red-800">{error}</p>
+            </div>
           </div>
+        </div>
+      )}
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-zinc-700">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
-              placeholder="you@example.com"
-            />
-          </div>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <Input
+          label="Full Legal Name"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          placeholder="e.g. John Doe"
+        />
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-zinc-700">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              className="w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
-              placeholder="••••••••"
-            />
-          </div>
+        <Input
+          label="Email Address"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          placeholder="citizen@example.com"
+        />
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-zinc-700">Role</label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
-            >
-              <option value="citizen">Citizen</option>
-              <option value="verifier">Verifier</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
+        <Input
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          minLength={6}
+          placeholder="••••••••"
+        />
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="rounded-lg bg-zinc-900 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50"
-          >
-            {loading ? "Creating account..." : "Create account"}
-          </button>
-        </form>
+        <Select
+          label="Account Role"
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          options={[
+            { value: "citizen", label: "Citizen (Default)" },
+            { value: "verifier", label: "Department Verifier" },
+            { value: "admin", label: "System Administrator" },
+          ]}
+        />
 
-        <p className="mt-6 text-center text-sm text-zinc-500">
-          Already have an account?{" "}
-          <Link href="/login" className="font-medium text-zinc-900 hover:underline">
-            Sign in
-          </Link>
-        </p>
+        <Button
+          type="submit"
+          disabled={loading}
+          size="lg"
+          className="w-full mt-4"
+        >
+          {loading ? "Registering..." : "Create Account"}
+        </Button>
+      </form>
+
+      <div className="mt-8 border-t border-gray-200 pt-6 text-center text-sm text-gray-600">
+        Already have an account?{" "}
+        <Link href="/login" className="font-semibold text-gov-mid-blue hover:text-gov-dark-blue">
+          Login here
+        </Link>
       </div>
-    </div>
+    </AuthLayout>
   );
 }
