@@ -1,0 +1,635 @@
+[
+  {
+    "_id": {
+      "$oid": "69b821a03eb4764743ca2c43"
+    },
+    "userId": {
+      "$oid": "69b8219e3eb4764743ca2c3f"
+    },
+    "income": 8000,
+    "employment_status": "self_employed",
+    "family_size": 8,
+    "education_level": "none",
+    "health_condition": true,
+    "housing_type": "rented",
+    "disaster_risk": "high",
+    "address": "H.No. 42, Sector 15, Near Govt. School, Jodhpur",
+    "district": "Jodhpur",
+    "phoneNumber": "+917881223994",
+    "documents": [
+      "income_certificate.pdf",
+      "ration_card.pdf",
+      "domicile_certificate.pdf"
+    ],
+    "vulnerabilityScore": 70,
+    "verificationStatus": "verified",
+    "createdAt": {
+      "$date": "2026-03-16T15:28:30.584Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.447Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "e821dd079cc4e7f2d74dd815"
+    },
+    "userId": {
+      "$oid": "69b821a03eb4764743ca2c46"
+    },
+    "income": 8000,
+    "employment_status": "employed",
+    "family_size": 3,
+    "education_level": "primary",
+    "health_condition": false,
+    "housing_type": "temporary",
+    "disaster_risk": "medium",
+    "address": "A-Block, DDA Flats, Vasant Kunj, Gaya",
+    "district": "Gaya",
+    "phoneNumber": "+917424150058",
+    "documents": [
+      "aadhaar_card.pdf",
+      "income_certificate.pdf",
+      "ration_card.pdf"
+    ],
+    "vulnerabilityScore": 50,
+    "verificationStatus": "rejected",
+    "createdAt": {
+      "$date": "2026-03-16T15:28:32.770Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.448Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "2fb7f755d787ffc6e805cca7"
+    },
+    "userId": {
+      "$oid": "69b823256e91f9de7721bf2c"
+    },
+    "income": 80000,
+    "employment_status": "retired",
+    "family_size": 8,
+    "education_level": "postgraduate",
+    "health_condition": false,
+    "housing_type": "homeless",
+    "disaster_risk": "medium",
+    "address": "C/O Ram Prasad, Village Khandwa, Tehsil Harda, Hubli",
+    "district": "Hubli",
+    "phoneNumber": "+918600884354",
+    "documents": [
+      "aadhaar_card.pdf",
+      "income_certificate.pdf"
+    ],
+    "vulnerabilityScore": 30,
+    "verificationStatus": "rejected",
+    "createdAt": {
+      "$date": "2026-03-16T15:35:01.578Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.448Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "fc98f451b3b1625821e58ce7"
+    },
+    "userId": {
+      "$oid": "69b823266e91f9de7721bf31"
+    },
+    "income": 15000,
+    "employment_status": "self_employed",
+    "family_size": 8,
+    "education_level": "none",
+    "health_condition": false,
+    "housing_type": "temporary",
+    "disaster_risk": "high",
+    "address": "12/A, Gandhi Nagar, Near Bus Stand, Kanpur",
+    "district": "Kanpur",
+    "phoneNumber": "+919307078650",
+    "documents": [
+      "aadhaar_card.pdf",
+      "income_certificate.pdf",
+      "ration_card.pdf"
+    ],
+    "vulnerabilityScore": 60,
+    "verificationStatus": "rejected",
+    "createdAt": {
+      "$date": "2026-03-16T15:35:02.805Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.448Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "842b87a523b95ffbc82e88a5"
+    },
+    "userId": {
+      "$oid": "69b823286e91f9de7721bf36"
+    },
+    "income": 30000,
+    "employment_status": "unemployed",
+    "family_size": 5,
+    "education_level": "none",
+    "health_condition": false,
+    "housing_type": "temporary",
+    "disaster_risk": "high",
+    "address": "Flat 102, Sunrise Tower, Ring Road, Surat",
+    "district": "Surat",
+    "phoneNumber": "+918118253494",
+    "documents": [
+      "aadhaar_card.pdf",
+      "income_certificate.pdf",
+      "domicile_certificate.pdf"
+    ],
+    "vulnerabilityScore": 65,
+    "verificationStatus": "verified",
+    "createdAt": {
+      "$date": "2026-03-16T15:35:04.910Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.448Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "c8bc9be3189a6b817260b9ff"
+    },
+    "userId": {
+      "$oid": "69b8232a6e91f9de7721bf3b"
+    },
+    "income": 80000,
+    "employment_status": "informal",
+    "family_size": 3,
+    "education_level": "primary",
+    "health_condition": false,
+    "housing_type": "rented",
+    "disaster_risk": "medium",
+    "address": "H.No. 5, Lane 3, Old City, Siliguri",
+    "district": "Siliguri",
+    "phoneNumber": "+917375943283",
+    "documents": [
+      "aadhaar_card.pdf",
+      "income_certificate.pdf"
+    ],
+    "vulnerabilityScore": 25,
+    "verificationStatus": "verified",
+    "createdAt": {
+      "$date": "2026-03-16T15:35:06.430Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "c860ab62bf175ae79df16e2a"
+    },
+    "userId": {
+      "$oid": "69b8232b6e91f9de7721bf40"
+    },
+    "income": 45000,
+    "employment_status": "employed",
+    "family_size": 6,
+    "education_level": "primary",
+    "health_condition": true,
+    "housing_type": "homeless",
+    "disaster_risk": "medium",
+    "address": "Flat 102, Sunrise Tower, Ring Road, Howrah",
+    "district": "Howrah",
+    "phoneNumber": "+919417592974",
+    "documents": [
+      "aadhaar_card.pdf",
+      "income_certificate.pdf"
+    ],
+    "vulnerabilityScore": 55,
+    "verificationStatus": "rejected",
+    "createdAt": {
+      "$date": "2026-03-16T15:35:07.601Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "fde4e76cb8e69c6f4e124a7b"
+    },
+    "userId": {
+      "$oid": "69b8232c6e91f9de7721bf45"
+    },
+    "income": 150000,
+    "employment_status": "unemployed",
+    "family_size": 6,
+    "education_level": "primary",
+    "health_condition": false,
+    "housing_type": "rented",
+    "disaster_risk": "low",
+    "address": "H.No. 5, Lane 3, Old City, Lucknow",
+    "district": "Lucknow",
+    "phoneNumber": "+917748494375",
+    "documents": [
+      "ration_card.pdf",
+      "bank_passbook.pdf"
+    ],
+    "vulnerabilityScore": 40,
+    "verificationStatus": "rejected",
+    "createdAt": {
+      "$date": "2026-03-16T15:35:08.683Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "342936121f3a65a14ca4e59d"
+    },
+    "userId": {
+      "$oid": "69b8232d6e91f9de7721bf4a"
+    },
+    "income": 30000,
+    "employment_status": "informal",
+    "family_size": 7,
+    "education_level": "none",
+    "health_condition": false,
+    "housing_type": "rented",
+    "disaster_risk": "low",
+    "address": "H.No. 5, Lane 3, Old City, Bengaluru",
+    "district": "Bengaluru",
+    "phoneNumber": "+918690677203",
+    "documents": [
+      "aadhaar_card.pdf",
+      "ration_card.pdf",
+      "bank_passbook.pdf",
+      "domicile_certificate.pdf"
+    ],
+    "vulnerabilityScore": 40,
+    "verificationStatus": "verified",
+    "createdAt": {
+      "$date": "2026-03-16T15:35:09.684Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "23538342e0867d4abe34bd3d"
+    },
+    "userId": {
+      "$oid": "69b8232e6e91f9de7721bf4f"
+    },
+    "income": 60000,
+    "employment_status": "informal",
+    "family_size": 7,
+    "education_level": "secondary",
+    "health_condition": false,
+    "housing_type": "homeless",
+    "disaster_risk": "high",
+    "address": "Plot 78, Phase II, Industrial Area, Mumbai",
+    "district": "Mumbai",
+    "phoneNumber": "+919508941740",
+    "documents": [
+      "aadhaar_card.pdf",
+      "ration_card.pdf"
+    ],
+    "vulnerabilityScore": 45,
+    "verificationStatus": "rejected",
+    "createdAt": {
+      "$date": "2026-03-16T15:35:10.415Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "45d50cde049c9172434e4a57"
+    },
+    "userId": {
+      "$oid": "69b824036e91f9de7721bf9b"
+    },
+    "income": 100000,
+    "employment_status": "unemployed",
+    "family_size": 2,
+    "education_level": "none",
+    "health_condition": false,
+    "housing_type": "rented",
+    "disaster_risk": "medium",
+    "address": "Village Rampur, Block Sadar, Post Office Rampur, Kolkata",
+    "district": "Kolkata",
+    "phoneNumber": "+917748321947",
+    "documents": [
+      "income_certificate.pdf",
+      "ration_card.pdf",
+      "domicile_certificate.pdf"
+    ],
+    "vulnerabilityScore": 40,
+    "verificationStatus": "verified",
+    "createdAt": {
+      "$date": "2026-03-16T15:38:43.393Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "fc5cf235dacea5142ca8cbcb"
+    },
+    "userId": {
+      "$oid": "69b824046e91f9de7721bfa0"
+    },
+    "income": 100000,
+    "employment_status": "employed",
+    "family_size": 3,
+    "education_level": "none",
+    "health_condition": false,
+    "housing_type": "homeless",
+    "disaster_risk": "high",
+    "address": "Plot 78, Phase II, Industrial Area, Thane",
+    "district": "Thane",
+    "phoneNumber": "+919809840289",
+    "documents": [
+      "aadhaar_card.pdf",
+      "income_certificate.pdf",
+      "bank_passbook.pdf"
+    ],
+    "vulnerabilityScore": 40,
+    "verificationStatus": "pending",
+    "createdAt": {
+      "$date": "2026-03-16T15:38:44.263Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65aae59c70866367f094a7fe"
+    },
+    "userId": {
+      "$oid": "69b824056e91f9de7721bfa5"
+    },
+    "income": 150000,
+    "employment_status": "unemployed",
+    "family_size": 8,
+    "education_level": "graduate",
+    "health_condition": false,
+    "housing_type": "temporary",
+    "disaster_risk": "low",
+    "address": "Gali No. 7, Mohalla Qazi, Old Town, Ahmedabad",
+    "district": "Ahmedabad",
+    "phoneNumber": "+917987135343",
+    "documents": [
+      "aadhaar_card.pdf",
+      "ration_card.pdf",
+      "domicile_certificate.pdf"
+    ],
+    "vulnerabilityScore": 40,
+    "verificationStatus": "rejected",
+    "createdAt": {
+      "$date": "2026-03-16T15:38:45.118Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "d430c6d0b5b37e7e9fd15423"
+    },
+    "userId": {
+      "$oid": "69b824056e91f9de7721bfaa"
+    },
+    "income": 150000,
+    "employment_status": "employed",
+    "family_size": 8,
+    "education_level": "secondary",
+    "health_condition": false,
+    "housing_type": "rented",
+    "disaster_risk": "medium",
+    "address": "C/O Ram Prasad, Village Khandwa, Tehsil Harda, Jodhpur",
+    "district": "Jodhpur",
+    "phoneNumber": "+919473298511",
+    "documents": [
+      "aadhaar_card.pdf",
+      "ration_card.pdf"
+    ],
+    "vulnerabilityScore": 15,
+    "verificationStatus": "verified",
+    "createdAt": {
+      "$date": "2026-03-16T15:38:45.945Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "ab398bc85cd98d6afc969934"
+    },
+    "userId": {
+      "$oid": "69b824066e91f9de7721bfaf"
+    },
+    "income": 8000,
+    "employment_status": "retired",
+    "family_size": 3,
+    "education_level": "graduate",
+    "health_condition": true,
+    "housing_type": "rented",
+    "disaster_risk": "medium",
+    "address": "J-45, Vikas Puri, Near Metro Station, Vadodara",
+    "district": "Vadodara",
+    "phoneNumber": "+919582483021",
+    "documents": [
+      "aadhaar_card.pdf",
+      "income_certificate.pdf",
+      "ration_card.pdf"
+    ],
+    "vulnerabilityScore": 40,
+    "verificationStatus": "verified",
+    "createdAt": {
+      "$date": "2026-03-16T15:38:46.794Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "8a6ba460d78b235dd6899e7a"
+    },
+    "userId": {
+      "$oid": "69b824076e91f9de7721bfb4"
+    },
+    "income": 80000,
+    "employment_status": "employed",
+    "family_size": 4,
+    "education_level": "primary",
+    "health_condition": false,
+    "housing_type": "temporary",
+    "disaster_risk": "high",
+    "address": "H.No. 42, Sector 15, Near Govt. School, Bhopal",
+    "district": "Bhopal",
+    "phoneNumber": "+917194580652",
+    "documents": [
+      "aadhaar_card.pdf",
+      "income_certificate.pdf",
+      "ration_card.pdf",
+      "bank_passbook.pdf"
+    ],
+    "vulnerabilityScore": 35,
+    "verificationStatus": "verified",
+    "createdAt": {
+      "$date": "2026-03-16T15:38:47.804Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "5543680f0ba6e32388ca10eb"
+    },
+    "userId": {
+      "$oid": "69b824086e91f9de7721bfb9"
+    },
+    "income": 5000,
+    "employment_status": "retired",
+    "family_size": 5,
+    "education_level": "postgraduate",
+    "health_condition": false,
+    "housing_type": "homeless",
+    "disaster_risk": "medium",
+    "address": "H.No. 5, Lane 3, Old City, Kochi",
+    "district": "Kochi",
+    "phoneNumber": "+918325051744",
+    "documents": [
+      "aadhaar_card.pdf",
+      "ration_card.pdf",
+      "bank_passbook.pdf",
+      "domicile_certificate.pdf"
+    ],
+    "vulnerabilityScore": 50,
+    "verificationStatus": "verified",
+    "createdAt": {
+      "$date": "2026-03-16T15:38:48.546Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "19b6ba2f4f96d2240973bf9b"
+    },
+    "userId": {
+      "$oid": "69b824096e91f9de7721bfbe"
+    },
+    "income": 22000,
+    "employment_status": "unemployed",
+    "family_size": 6,
+    "education_level": "none",
+    "health_condition": false,
+    "housing_type": "rented",
+    "disaster_risk": "medium",
+    "address": "C/O Ram Prasad, Village Khandwa, Tehsil Harda, Lucknow",
+    "district": "Lucknow",
+    "phoneNumber": "+917520595534",
+    "documents": [
+      "aadhaar_card.pdf",
+      "income_certificate.pdf"
+    ],
+    "vulnerabilityScore": 65,
+    "verificationStatus": "pending",
+    "createdAt": {
+      "$date": "2026-03-16T15:38:49.388Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "ee8f804088909cc0566fce9a"
+    },
+    "userId": {
+      "$oid": "69b8240a6e91f9de7721bfc3"
+    },
+    "income": 80000,
+    "employment_status": "retired",
+    "family_size": 3,
+    "education_level": "primary",
+    "health_condition": false,
+    "housing_type": "homeless",
+    "disaster_risk": "medium",
+    "address": "Plot 78, Phase II, Industrial Area, Howrah",
+    "district": "Howrah",
+    "phoneNumber": "+919064121154",
+    "documents": [
+      "aadhaar_card.pdf",
+      "income_certificate.pdf"
+    ],
+    "vulnerabilityScore": 30,
+    "verificationStatus": "verified",
+    "createdAt": {
+      "$date": "2026-03-16T15:38:50.169Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "e8b89faaa5e83ce06c416fad"
+    },
+    "userId": {
+      "$oid": "69b8240b6e91f9de7721bfc8"
+    },
+    "income": 25000,
+    "employment_status": "employed",
+    "family_size": 6,
+    "education_level": "none",
+    "health_condition": true,
+    "housing_type": "temporary",
+    "disaster_risk": "medium",
+    "address": "A-Block, DDA Flats, Vasant Kunj, Mysuru",
+    "district": "Mysuru",
+    "phoneNumber": "+918380757383",
+    "documents": [
+      "ration_card.pdf"
+    ],
+    "vulnerabilityScore": 65,
+    "verificationStatus": "pending",
+    "createdAt": {
+      "$date": "2026-03-16T15:38:51.008Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  }
+]
