@@ -24,7 +24,21 @@ export async function GET() {
       await User.findByIdAndUpdate(currentUser._id, { profile: profile._id });
     }
 
-    return NextResponse.json({ success: true, profile });
+    // Map profile back to frontend shape
+    const mappedProfile = {
+      ...profile.toObject(),
+      phoneNumber: profile.phone,
+      family_size: profile.familySize,
+      employment_status: profile.employmentStatus,
+      education_level: profile.educationLevel,
+      health_condition: profile.healthCondition,
+      district: profile.address?.district,
+      address: profile.address?.village, // or full address
+      state: profile.address?.state,
+      pincode: profile.address?.pincode,
+    };
+
+    return NextResponse.json({ success: true, profile: mappedProfile });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, message: error.message || "Server error" },
@@ -47,16 +61,46 @@ export async function PUT(req: NextRequest) {
 
     const updates = await req.json();
 
-    // Prevent citizens from changing sensitive fields
-    delete updates.verificationStatus;
-    delete updates.vulnerabilityScore;
-    delete updates.user;
-    delete updates.userId;
-    delete updates._id;
+    // Map frontend specific shape to Mongoose schema shape
+    const mappedUpdates: any = {
+      phone: updates.phoneNumber,
+      age: updates.age,
+      gender: updates.gender,
+      income: updates.income,
+      employmentStatus: updates.employment_status,
+      familySize: updates.family_size,
+      educationLevel: updates.education_level,
+      healthCondition: updates.health_condition,
+      disability: updates.disability,
+      propertyOwned: updates.propertyOwned,
+      bankAccount: updates.bankAccount,
+      ruralFlag: updates.ruralFlag,
+    };
+
+    // Nest address fields correctly
+    if (updates.address || updates.district || updates.state || updates.pincode || updates.village) {
+      mappedUpdates.address = {
+        state: updates.state,
+        district: updates.district,
+        village: updates.village,
+        pincode: updates.pincode,
+        // The frontend currently passes the full address string in `address`
+        // We'll store it in village or as a new field if needed. 
+        // For now, let's store it in `village` if we don't have a separate fullAddress field.
+        ...(updates.address && { village: updates.address })
+      };
+    }
+
+    // Clean up undefined values from mappedUpdates
+    Object.keys(mappedUpdates).forEach(key => {
+      if (mappedUpdates[key] === undefined) {
+        delete mappedUpdates[key];
+      }
+    });
 
     const profile = await CitizenProfile.findOneAndUpdate(
       { userId: currentUser._id },
-      { $set: updates },
+      { $set: mappedUpdates },
       { new: true, runValidators: true, upsert: true },
     );
 

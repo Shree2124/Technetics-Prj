@@ -2,16 +2,16 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface ICitizenProfile extends Document {
   userId: mongoose.Types.ObjectId;
-  fullName: string;
-  aadhaarNumber: string;
-  phone: string;
-  age: number;
-  gender: string;
-  address: {
-    state: string;
-    district: string;
-    village: string;
-    pincode: string;
+  fullName?: string;
+  aadhaarNumber?: string;
+  phone?: string;
+  age?: number;
+  gender?: string;
+  address?: {
+    state?: string;
+    district?: string;
+    village?: string;
+    pincode?: string;
   };
   ruralFlag: boolean;
   income: number;
@@ -22,6 +22,8 @@ export interface ICitizenProfile extends Document {
   disability: boolean;
   propertyOwned: number;
   bankAccount: string;
+  verificationStatus: string;
+  vulnerabilityScore: number;
   createdAt: Date;
 }
 
@@ -33,16 +35,16 @@ const CitizenProfileSchema = new Schema<ICitizenProfile>(
       required: true,
       unique: true,
     },
-    fullName: { type: String, required: true },
-    aadhaarNumber: { type: String, required: true, unique: true },
-    phone: { type: String, required: true },
-    age: { type: Number, required: true },
-    gender: { type: String, required: true },
+    fullName: { type: String },
+    aadhaarNumber: { type: String, unique: true, sparse: true },
+    phone: { type: String },
+    age: { type: Number },
+    gender: { type: String },
     address: {
-      state: { type: String, required: true },
-      district: { type: String, required: true },
-      village: { type: String, required: true },
-      pincode: { type: String, required: true },
+      state: { type: String },
+      district: { type: String },
+      village: { type: String },
+      pincode: { type: String },
     },
     ruralFlag: { type: Boolean, default: false },
     income: { type: Number, default: 0 },
@@ -53,6 +55,12 @@ const CitizenProfileSchema = new Schema<ICitizenProfile>(
     disability: { type: Boolean, default: false },
     propertyOwned: { type: Number, default: 0 },
     bankAccount: { type: String },
+    verificationStatus: {
+      type: String,
+      enum: ["pending", "verified", "rejected"],
+      default: "pending",
+    },
+    vulnerabilityScore: { type: Number, default: 0 },
   },
   { timestamps: { createdAt: true, updatedAt: false } },
 );
