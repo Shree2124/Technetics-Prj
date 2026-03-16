@@ -1,0 +1,551 @@
+[
+  {
+    "_id": {
+      "$oid": "69b8232f6e91f9de7721bf56"
+    },
+    "userId": {
+      "$oid": "69b8232f6e91f9de7721bf54"
+    },
+    "department": "Social Welfare Department",
+    "region": "South India Zone",
+    "designation": "Block Development Officer",
+    "isActive": true,
+    "verifiedCitizens": [
+      {
+        "$oid": "69b824076e91f9de7721bfb4"
+      },
+      {
+        "$oid": "69b823266e91f9de7721bf31"
+      },
+      {
+        "$oid": "69b8232a6e91f9de7721bf3b"
+      },
+      {
+        "$oid": "69b824046e91f9de7721bfa0"
+      },
+      {
+        "$oid": "69b8232d6e91f9de7721bf4a"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-03-16T15:35:11.182Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "efdf4288e20e986bf5468a55"
+    },
+    "userId": {
+      "$oid": "69b823326e91f9de7721bf5a"
+    },
+    "department": "Rural Development Department",
+    "region": "West Bengal Region",
+    "designation": "District Welfare Officer",
+    "isActive": true,
+    "verifiedCitizens": [],
+    "createdAt": {
+      "$date": "2026-03-16T15:35:14.227Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "8763b92a3074cfc7040b3f65"
+    },
+    "userId": {
+      "$oid": "69b823336e91f9de7721bf5f"
+    },
+    "department": "Health & Family Welfare",
+    "region": "South India Zone",
+    "designation": "Senior Verification Officer",
+    "isActive": true,
+    "verifiedCitizens": [
+      {
+        "$oid": "69b824036e91f9de7721bf9b"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-03-16T15:35:15.571Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "445a176f871c7d1d0b1bb957"
+    },
+    "userId": {
+      "$oid": "69b823356e91f9de7721bf64"
+    },
+    "department": "Ministry of Agriculture",
+    "region": "North India Zone",
+    "designation": "Assistant Commissioner (Verification)",
+    "isActive": true,
+    "verifiedCitizens": [
+      {
+        "$oid": "69b823286e91f9de7721bf36"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-03-16T15:35:17.843Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "b7be53cb71cf5c763899d7de"
+    },
+    "userId": {
+      "$oid": "69b823366e91f9de7721bf69"
+    },
+    "department": "Ministry of Housing & Urban Affairs",
+    "region": "North India Zone",
+    "designation": "Taluka Verification Inspector",
+    "isActive": true,
+    "verifiedCitizens": [
+      {
+        "$oid": "69b8232c6e91f9de7721bf45"
+      },
+      {
+        "$oid": "69b823256e91f9de7721bf2c"
+      },
+      {
+        "$oid": "69b824056e91f9de7721bfaa"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-03-16T15:35:18.528Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "45d371ba4532c661beb1f3e3"
+    },
+    "userId": {
+      "$oid": "69b823376e91f9de7721bf6e"
+    },
+    "department": "Women & Child Development",
+    "region": "Northeast India Zone",
+    "designation": "Deputy Director (Citizen Services)",
+    "isActive": true,
+    "verifiedCitizens": [
+      {
+        "$oid": "69b821a03eb4764743ca2c46"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-03-16T15:35:19.306Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "7b49e54ea7e0ed490648ef2d"
+    },
+    "userId": {
+      "$oid": "69b823386e91f9de7721bf73"
+    },
+    "department": "Ministry of Education",
+    "region": "Karnataka Region",
+    "designation": "Field Verification Officer",
+    "isActive": true,
+    "verifiedCitizens": [],
+    "createdAt": {
+      "$date": "2026-03-16T15:35:20.023Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "97fcaac5f7598d64e3f16c73"
+    },
+    "userId": {
+      "$oid": "69b8233a6e91f9de7721bf78"
+    },
+    "department": "Ministry of Finance - DBT Cell",
+    "region": "Rajasthan Region",
+    "designation": "Regional Verification Coordinator",
+    "isActive": true,
+    "verifiedCitizens": [
+      {
+        "$oid": "69b8232b6e91f9de7721bf40"
+      },
+      {
+        "$oid": "69b8232d6e91f9de7721bf4a"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-03-16T15:35:22.144Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "a7b4a78c7752a3a22e9603e8"
+    },
+    "userId": {
+      "$oid": "69b8233a6e91f9de7721bf7d"
+    },
+    "department": "Tribal Affairs Department",
+    "region": "Uttar Pradesh Region",
+    "designation": "Scheme Verification Analyst",
+    "isActive": true,
+    "verifiedCitizens": [
+      {
+        "$oid": "69b8240b6e91f9de7721bfc8"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-03-16T15:35:22.889Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "46122a198436b0564a8f11da"
+    },
+    "userId": {
+      "$oid": "69b8233b6e91f9de7721bf82"
+    },
+    "department": "District Administration Office",
+    "region": "North India Zone",
+    "designation": "Junior Verification Assistant",
+    "isActive": true,
+    "verifiedCitizens": [
+      {
+        "$oid": "69b824056e91f9de7721bfa5"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-03-16T15:35:23.887Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "9f5ccfa806a80d6fb5b566f1"
+    },
+    "userId": {
+      "$oid": "69b8240b6e91f9de7721bfcd"
+    },
+    "department": "Social Welfare Department",
+    "region": "Uttar Pradesh Region",
+    "designation": "Block Development Officer",
+    "isActive": true,
+    "verifiedCitizens": [
+      {
+        "$oid": "69b823286e91f9de7721bf36"
+      },
+      {
+        "$oid": "69b823266e91f9de7721bf31"
+      },
+      {
+        "$oid": "69b8232a6e91f9de7721bf3b"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-03-16T15:38:51.788Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "26726e91e265f5e50083a467"
+    },
+    "userId": {
+      "$oid": "69b8240c6e91f9de7721bfd2"
+    },
+    "department": "Rural Development Department",
+    "region": "Uttar Pradesh Region",
+    "designation": "District Welfare Officer",
+    "isActive": false,
+    "verifiedCitizens": [],
+    "createdAt": {
+      "$date": "2026-03-16T15:38:52.525Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "350b8fefd1e7ed0a5b6fd438"
+    },
+    "userId": {
+      "$oid": "69b8240d6e91f9de7721bfd7"
+    },
+    "department": "Health & Family Welfare",
+    "region": "South India Zone",
+    "designation": "Senior Verification Officer",
+    "isActive": true,
+    "verifiedCitizens": [
+      {
+        "$oid": "69b8232c6e91f9de7721bf45"
+      },
+      {
+        "$oid": "69b823266e91f9de7721bf31"
+      },
+      {
+        "$oid": "69b824056e91f9de7721bfaa"
+      },
+      {
+        "$oid": "69b823256e91f9de7721bf2c"
+      },
+      {
+        "$oid": "69b8240b6e91f9de7721bfc8"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-03-16T15:38:53.306Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "faefc3be94a1f18899cce2bc"
+    },
+    "userId": {
+      "$oid": "69b8240e6e91f9de7721bfdc"
+    },
+    "department": "Ministry of Agriculture",
+    "region": "Uttar Pradesh Region",
+    "designation": "Assistant Commissioner (Verification)",
+    "isActive": true,
+    "verifiedCitizens": [
+      {
+        "$oid": "69b823286e91f9de7721bf36"
+      },
+      {
+        "$oid": "69b823266e91f9de7721bf31"
+      },
+      {
+        "$oid": "69b824046e91f9de7721bfa0"
+      },
+      {
+        "$oid": "69b824056e91f9de7721bfaa"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-03-16T15:38:54.110Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "574ac335709676d601ca8357"
+    },
+    "userId": {
+      "$oid": "69b8240f6e91f9de7721bfe1"
+    },
+    "department": "Ministry of Housing & Urban Affairs",
+    "region": "Rajasthan Region",
+    "designation": "Taluka Verification Inspector",
+    "isActive": true,
+    "verifiedCitizens": [
+      {
+        "$oid": "69b824056e91f9de7721bfa5"
+      },
+      {
+        "$oid": "69b823286e91f9de7721bf36"
+      },
+      {
+        "$oid": "69b824086e91f9de7721bfb9"
+      },
+      {
+        "$oid": "69b824096e91f9de7721bfbe"
+      },
+      {
+        "$oid": "69b824036e91f9de7721bf9b"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-03-16T15:38:55.117Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "2833ffa2c32e20e6e64d572e"
+    },
+    "userId": {
+      "$oid": "69b8240f6e91f9de7721bfe6"
+    },
+    "department": "Women & Child Development",
+    "region": "Uttar Pradesh Region",
+    "designation": "Deputy Director (Citizen Services)",
+    "isActive": false,
+    "verifiedCitizens": [
+      {
+        "$oid": "69b824036e91f9de7721bf9b"
+      },
+      {
+        "$oid": "69b823256e91f9de7721bf2c"
+      },
+      {
+        "$oid": "69b8232a6e91f9de7721bf3b"
+      },
+      {
+        "$oid": "69b8232b6e91f9de7721bf40"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-03-16T15:38:55.883Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "b9e70629316af0eb5e3e152b"
+    },
+    "userId": {
+      "$oid": "69b824116e91f9de7721bfeb"
+    },
+    "department": "Ministry of Education",
+    "region": "Maharashtra Region",
+    "designation": "Field Verification Officer",
+    "isActive": true,
+    "verifiedCitizens": [
+      {
+        "$oid": "69b823256e91f9de7721bf2c"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-03-16T15:38:57.345Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "e2e96b9d0cb70831870c9fbd"
+    },
+    "userId": {
+      "$oid": "69b824136e91f9de7721bff0"
+    },
+    "department": "Ministry of Finance - DBT Cell",
+    "region": "Tamil Nadu Region",
+    "designation": "Regional Verification Coordinator",
+    "isActive": true,
+    "verifiedCitizens": [
+      {
+        "$oid": "69b824066e91f9de7721bfaf"
+      },
+      {
+        "$oid": "69b824036e91f9de7721bf9b"
+      },
+      {
+        "$oid": "69b8232a6e91f9de7721bf3b"
+      },
+      {
+        "$oid": "69b823286e91f9de7721bf36"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-03-16T15:38:59.027Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "5ac03804aebd8712b71c31f9"
+    },
+    "userId": {
+      "$oid": "69b824146e91f9de7721bff5"
+    },
+    "department": "Tribal Affairs Department",
+    "region": "Northeast India Zone",
+    "designation": "Scheme Verification Analyst",
+    "isActive": false,
+    "verifiedCitizens": [
+      {
+        "$oid": "69b821a03eb4764743ca2c46"
+      },
+      {
+        "$oid": "69b8232a6e91f9de7721bf3b"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-03-16T15:39:00.152Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "b2a51efb03d22114a0383199"
+    },
+    "userId": {
+      "$oid": "69b824166e91f9de7721bffa"
+    },
+    "department": "District Administration Office",
+    "region": "North India Zone",
+    "designation": "Junior Verification Assistant",
+    "isActive": true,
+    "verifiedCitizens": [
+      {
+        "$oid": "69b8219e3eb4764743ca2c3f"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-03-16T15:39:02.467Z"
+    },
+    "updatedAt": {
+      "$date": "2026-03-16T17:25:29.449Z"
+    },
+    "__v": 0
+  }
+]
