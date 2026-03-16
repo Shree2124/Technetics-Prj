@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
-import { getCurrentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/auth";
 import Application from "@/models/Application";
 import CitizenProfile from "@/models/CitizenProfile";
 import User from "@/models/User";
