@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from models.citizen_model import CitizenData
-from services.fraud_service import detect_fraud
+from app.models.citizen_model import CitizenData
+from app.services.fraud_service import detect_fraud
 
 router = APIRouter(prefix="/ai", tags=["AI Fraud Detection"])
 

@@ -1,5 +1,11 @@
+import sys
+import os
+
+# Add project root to the Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from fastapi import FastAPI
-from routes import vulnerability, fraud, recommendation
+from app.routes import vulnerability, fraud, recommendation
 
 app = FastAPI(
     title="AI Welfare Allocation Service",

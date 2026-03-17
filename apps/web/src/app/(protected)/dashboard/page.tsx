@@ -5,10 +5,27 @@ import { useAppSelector } from "@/store/hooks";
 import Link from "next/link";
 import api from "@/lib/axios";
 import {
-  Users, FileText, CheckCircle, Clock, AlertTriangle, ShieldCheck,
-  CreditCard, Activity, IndianRupee, Heart, Home, MapPin, Briefcase,
-  ArrowRight, TrendingUp, Gauge, UserCheck, Shield,
+  Users,
+  FileText,
+  CheckCircle,
+  Clock,
+  AlertTriangle,
+  ShieldCheck,
+  Activity,
+  IndianRupee,
+  Home,
+  MapPin,
+  Briefcase,
+  ArrowRight,
+  TrendingUp,
+  Gauge,
+  UserCheck,
+  Shield,
 } from "lucide-react";
+
+// ────────────────────────────────
+// INTERFACES
+// ────────────────────────────────
 
 interface CitizenProfileData {
   income: number;
@@ -26,38 +43,382 @@ interface CitizenProfileData {
   verificationStatus: string;
 }
 
-export default function DashboardPage() {
-  const { user } = useAppSelector((state) => state.auth);
+// ────────────────────────────────
+// SHARED COMPONENTS
+// ────────────────────────────────
 
-  if (!user) return null;
-
+function StatCard({
+  title,
+  value,
+  icon,
+  color,
+  capitalize,
+}: {
+  title: string;
+  value: string;
+  icon: React.ReactNode;
+  color: string;
+  capitalize?: boolean;
+}) {
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      {/* Header Section */}
-      <div className="flex flex-col gap-1">
-        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-gov-dark-blue">
-          Dashboard Overview
-        </h1>
-        <p className="text-sm text-gray-500">
-          Welcome back, <span className="font-semibold text-gov-dark-blue">{user.name}</span>
+    <div className="rounded-xl border border-gray-200 bg-white p-4 md:p-5 shadow-sm">
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+          {title}
         </p>
+        <div className={`p-2 rounded-lg ${color}`}>{icon}</div>
       </div>
-
-      {user.role === "admin" && <AdminDashboard />}
-      {user.role === "verifier" && <VerifierDashboard />}
-      {user.role === "citizen" && <CitizenDashboard />}
+      <p
+        className={`text-lg md:text-2xl font-bold text-gov-dark-blue ${
+          capitalize ? "capitalize" : ""
+        }`}
+      >
+        {value}
+      </p>
     </div>
   );
 }
 
-/* ─── CITIZEN DASHBOARD ────────────────────────────────────────────── */
+function InfoCard({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm flex items-center gap-3">
+      <div className="p-2 rounded-lg bg-gray-100 text-gray-500 flex-shrink-0">
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+          {label}
+        </p>
+        <p className="text-sm font-semibold text-gov-dark-blue capitalize truncate">
+          {value}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function TabButton({
+  name,
+  activeTab,
+  setActiveTab,
+  icon,
+}: {
+  name: string;
+  activeTab: string;
+  setActiveTab: (name: string) => void;
+  icon: React.ReactNode;
+}) {
+  const isActive = activeTab === name;
+  return (
+    <button
+      onClick={() => setActiveTab(name)}
+      className={`flex items-center gap-2 whitespace-nowrap border-b-2 py-3 px-1 text-sm font-medium transition-all ${
+        isActive
+          ? "border-gov-dark-blue text-gov-dark-blue"
+          : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+      }`}
+    >
+      {icon}
+      <span className="capitalize">{name}</span>
+    </button>
+  );
+}
+
+function RecommendationsModal({
+  citizen,
+  recommendations,
+  onClose,
+}: {
+  citizen: any;
+  recommendations: any[];
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl shadow-lg max-w-lg w-full">
+        <div className="p-4 border-b">
+          <h2 className="text-lg font-semibold text-gov-dark-blue">
+            Scheme Recommendations for {citizen.userId.name}
+          </h2>
+        </div>
+        <div className="p-4 max-h-[60vh] overflow-y-auto">
+          {recommendations.length > 0 ? (
+            <div className="space-y-3">
+              {recommendations.map((rec, i) => (
+                <div key={i} className="p-3 rounded-lg bg-gray-50">
+                  <p className="font-semibold text-gov-dark-blue">
+                    {rec.scheme_name}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {rec.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500 text-center py-8">
+              Loading recommendations...
+            </p>
+          )}
+        </div>
+        <div className="p-3 bg-gray-50 rounded-b-xl text-right">
+          <button
+            onClick={onClose}
+            className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ────────────────────────────────
+// ADMIN DASHBOARD TABS
+// ────────────────────────────────
+
+function AdminOverviewTab() {
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api
+      .get("/api/admin/stats")
+      .then((res) => setStats(res.data.stats))
+      .catch((err) => console.error("Failed to load admin stats", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-gov-mid-blue border-t-transparent" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          title="Total Citizens"
+          value={stats?.totalCitizens?.toLocaleString() || "0"}
+          icon={<Users className="h-5 w-5" />}
+          color="text-blue-600 bg-blue-50"
+        />
+        <StatCard
+          title="Active Schemes"
+          value={stats?.activeSchemes?.toString() || "0"}
+          icon={<Activity className="h-5 w-5" />}
+          color="text-green-600 bg-green-50"
+        />
+        <StatCard
+          title="Total Applications"
+          value={stats?.totalApplications?.toLocaleString() || "0"}
+          icon={<FileText className="h-5 w-5" />}
+          color="text-amber-600 bg-amber-50"
+        />
+        <StatCard
+          title="Approved"
+          value={stats?.approvedCount?.toString() || "0"}
+          icon={<CheckCircle className="h-5 w-5" />}
+          color="text-emerald-600 bg-emerald-50"
+        />
+      </div>
+
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-3">
+        <StatCard
+          title="Pending"
+          value={stats?.pendingCount?.toString() || "0"}
+          icon={<Clock className="h-5 w-5" />}
+          color="text-amber-600 bg-amber-50"
+        />
+        <StatCard
+          title="Rejected"
+          value={stats?.rejectedCount?.toString() || "0"}
+          icon={<AlertTriangle className="h-5 w-5" />}
+          color="text-red-600 bg-red-50"
+        />
+        <StatCard
+          title="Fraud Flagged"
+          value={stats?.flaggedCount?.toString() || "0"}
+          icon={<ShieldCheck className="h-5 w-5" />}
+          color="text-rose-600 bg-rose-50"
+        />
+      </div>
+
+      {/* Quick Access */}
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-bold text-gov-dark-blue">
+            Scheme Applications
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">
+            {stats?.pendingCount || 0} pending + {stats?.underReviewCount || 0}{" "}
+            under review applications need your attention.
+          </p>
+        </div>
+        <Link
+          href="/admin/applications"
+          className="rounded-lg bg-gov-dark-blue px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gov-dark-blue/90 flex items-center gap-2 shrink-0"
+        >
+          View All Applications
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function VulnerabilityTab() {
+  const [citizens, setCitizens] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [selectedCitizen, setSelectedCitizen] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    api
+      .get("/api/admin/vulnerable-citizens")
+      .then((res) => setCitizens(res.data.citizens))
+      .catch((err) => console.error("Failed to load vulnerable citizens", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleGetRecommendations = (citizen: any) => {
+    setSelectedCitizen(citizen);
+    setRecommendations([]); // Clear previous recommendations
+    setIsModalOpen(true);
+    api
+      .get(`/api/admin/recommendations?citizenId=${citizen._id}`)
+      .then((res) => setRecommendations(res.data.recommendations))
+      .catch((err) => console.error("Failed to load recommendations", err));
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-gov-mid-blue border-t-transparent" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="border-b border-gray-100 bg-gray-50/60 px-5 py-3">
+        <h2 className="text-sm font-semibold text-gov-dark-blue">
+          Top Vulnerable Citizens
+        </h2>
+      </div>
+      <div className="divide-y divide-gray-100">
+        {citizens.map((citizen) => (
+          <div
+            key={citizen._id}
+            className="p-4 flex items-center justify-between"
+          >
+            <div>
+              <p className="font-semibold text-gov-dark-blue">
+                {citizen.userId.name}
+              </p>
+              <p className="text-xs text-gray-500">{citizen.district}</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <p className="text-lg font-bold text-amber-600">
+                  {citizen.vulnerabilityScore}%
+                </p>
+                <p className="text-xs text-gray-400">Vulnerability</p>
+              </div>
+              <button
+                onClick={() => handleGetRecommendations(citizen)}
+                className="rounded-lg bg-gov-dark-blue px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-gov-dark-blue/90"
+              >
+                Get Recommendations
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+      {isModalOpen && (
+        <RecommendationsModal
+          citizen={selectedCitizen}
+          recommendations={recommendations}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+function FraudTab() {
+  const [applications, setApplications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api
+      .get("/api/admin/fraud-applications")
+      .then((res) => setApplications(res.data.applications))
+      .catch((err) => console.error("Failed to load fraud applications", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-gov-mid-blue border-t-transparent" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="border-b border-gray-100 bg-gray-50/60 px-5 py-3">
+        <h2 className="text-sm font-semibold text-gov-dark-blue">
+          Fraud Flagged Applications
+        </h2>
+      </div>
+      <div className="divide-y divide-gray-100">
+        {applications.map((app) => (
+          <div key={app._id} className="p-4 flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-gov-dark-blue">
+                {app.userId.name}
+              </p>
+              <p className="text-xs text-gray-500">{app.schemeId.name}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-lg font-bold text-red-600">
+                {app.fraudScore}%
+              </p>
+              <p className="text-xs text-gray-400">Fraud Score</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ────────────────────────────────
+// ROLE-SPECIFIC DASHBOARDS
+// ────────────────────────────────
 
 function CitizenDashboard() {
   const [profile, setProfile] = useState<CitizenProfileData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get("/api/citizen/profile")
+    api
+      .get("/api/citizen/profile")
       .then((res) => setProfile(res.data.profile))
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -71,17 +432,19 @@ function CitizenDashboard() {
     );
   }
 
-  const statusColor = profile?.verificationStatus === "verified"
-    ? "bg-green-100 text-green-700 border-green-200"
-    : profile?.verificationStatus === "rejected"
-      ? "bg-red-100 text-red-700 border-red-200"
-      : "bg-amber-100 text-amber-700 border-amber-200";
+  const statusColor =
+    profile?.verificationStatus === "verified"
+      ? "bg-green-100 text-green-700 border-green-200"
+      : profile?.verificationStatus === "rejected"
+        ? "bg-red-100 text-red-700 border-red-200"
+        : "bg-amber-100 text-amber-700 border-amber-200";
 
-  const riskColor = profile?.disaster_risk === "high"
-    ? "text-red-600"
-    : profile?.disaster_risk === "medium"
-      ? "text-amber-600"
-      : "text-green-600";
+  const riskColor =
+    profile?.disaster_risk === "high"
+      ? "text-red-600"
+      : profile?.disaster_risk === "medium"
+        ? "text-amber-600"
+        : "text-green-600";
 
   return (
     <div className="space-y-6">
@@ -103,7 +466,11 @@ function CitizenDashboard() {
           title="Verification"
           value={profile?.verificationStatus || "—"}
           icon={<UserCheck className="h-5 w-5" />}
-          color={profile?.verificationStatus === "verified" ? "text-green-600 bg-green-50" : "text-amber-600 bg-amber-50"}
+          color={
+            profile?.verificationStatus === "verified"
+              ? "text-green-600 bg-green-50"
+              : "text-amber-600 bg-amber-50"
+          }
           capitalize
         />
         <StatCard
@@ -116,10 +483,26 @@ function CitizenDashboard() {
 
       {/* Second Row */}
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-        <InfoCard icon={<Briefcase />} label="Employment" value={profile?.employment_status?.replace("_", " ") || "—"} />
-        <InfoCard icon={<Home />} label="Housing" value={profile?.housing_type || "—"} />
-        <InfoCard icon={<MapPin />} label="District" value={profile?.district || "—"} />
-        <InfoCard icon={<AlertTriangle className={riskColor} />} label="Disaster Risk" value={profile?.disaster_risk || "—"} />
+        <InfoCard
+          icon={<Briefcase />}
+          label="Employment"
+          value={profile?.employment_status?.replace("_", " ") || "—"}
+        />
+        <InfoCard
+          icon={<Home />}
+          label="Housing"
+          value={profile?.housing_type || "—"}
+        />
+        <InfoCard
+          icon={<MapPin />}
+          label="District"
+          value={profile?.district || "—"}
+        />
+        <InfoCard
+          icon={<AlertTriangle className={riskColor} />}
+          label="Disaster Risk"
+          value={profile?.disaster_risk || "—"}
+        />
       </div>
 
       {/* Quick Links + Recent */}
@@ -127,7 +510,9 @@ function CitizenDashboard() {
         {/* Quick Actions */}
         <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
           <div className="border-b border-gray-100 bg-gray-50/60 px-5 py-3">
-            <h2 className="text-sm font-semibold text-gov-dark-blue">Quick Actions</h2>
+            <h2 className="text-sm font-semibold text-gov-dark-blue">
+              Quick Actions
+            </h2>
           </div>
           <div className="p-4 space-y-2">
             <Link
@@ -166,20 +551,29 @@ function CitizenDashboard() {
         {/* Documents Status */}
         <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
           <div className="border-b border-gray-100 bg-gray-50/60 px-5 py-3">
-            <h2 className="text-sm font-semibold text-gov-dark-blue">Uploaded Documents</h2>
+            <h2 className="text-sm font-semibold text-gov-dark-blue">
+              Uploaded Documents
+            </h2>
           </div>
           <div className="p-4">
             {profile?.documents && profile.documents.length > 0 ? (
               <div className="space-y-2">
                 {profile.documents.map((doc, i) => (
-                  <div key={i} className="flex items-center gap-3 rounded-lg bg-gray-50 px-4 py-2.5 text-sm">
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 rounded-lg bg-gray-50 px-4 py-2.5 text-sm"
+                  >
                     <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                    <span className="text-gray-700 capitalize">{doc.replace(/_/g, " ").replace(".pdf", "")}</span>
+                    <span className="text-gray-700 capitalize">
+                      {doc.replace(/_/g, " ").replace(".pdf", "")}
+                    </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-400 text-center py-6">No documents uploaded yet</p>
+              <p className="text-sm text-gray-400 text-center py-6">
+                No documents uploaded yet
+              </p>
             )}
           </div>
         </div>
@@ -193,7 +587,9 @@ function CitizenDashboard() {
         <div>
           <h3 className="text-sm font-semibold">Need Help?</h3>
           <p className="text-xs text-white/80 mt-1 max-w-2xl leading-relaxed">
-            Contact your district nodal officer or visit the nearest Common Service Centre (CSC) for assistance with application submission and document verification.
+            Contact your district nodal officer or visit the nearest Common
+            Service Centre (CSC) for assistance with application submission and
+            document verification.
           </p>
         </div>
       </div>
@@ -201,70 +597,54 @@ function CitizenDashboard() {
   );
 }
 
-/* ─── ADMIN DASHBOARD ─────────────────────────────────────────────── */
-
 function AdminDashboard() {
-  const [stats, setStats] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api.get("/api/admin/stats")
-      .then((res) => setStats(res.data.stats))
-      .catch((err) => console.error("Failed to load admin stats", err))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-16">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-gov-mid-blue border-t-transparent" />
-      </div>
-    );
-  }
+  const [activeTab, setActiveTab] = useState("overview");
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Total Citizens" value={stats?.totalCitizens?.toLocaleString() || "0"} icon={<Users className="h-5 w-5" />} color="text-blue-600 bg-blue-50" />
-        <StatCard title="Active Schemes" value={stats?.activeSchemes?.toString() || "0"} icon={<Activity className="h-5 w-5" />} color="text-green-600 bg-green-50" />
-        <StatCard title="Total Applications" value={stats?.totalApplications?.toLocaleString() || "0"} icon={<FileText className="h-5 w-5" />} color="text-amber-600 bg-amber-50" />
-        <StatCard title="Approved" value={stats?.approvedCount?.toString() || "0"} icon={<CheckCircle className="h-5 w-5" />} color="text-emerald-600 bg-emerald-50" />
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+          <TabButton
+            name="overview"
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            icon={<Activity />}
+          />
+          <TabButton
+            name="vulnerability"
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            icon={<TrendingUp />}
+          />
+          <TabButton
+            name="fraud"
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            icon={<ShieldCheck />}
+          />
+        </nav>
       </div>
 
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-3">
-        <StatCard title="Pending" value={stats?.pendingCount?.toString() || "0"} icon={<Clock className="h-5 w-5" />} color="text-amber-600 bg-amber-50" />
-        <StatCard title="Rejected" value={stats?.rejectedCount?.toString() || "0"} icon={<AlertTriangle className="h-5 w-5" />} color="text-red-600 bg-red-50" />
-        <StatCard title="Fraud Flagged" value={stats?.flaggedCount?.toString() || "0"} icon={<ShieldCheck className="h-5 w-5" />} color="text-rose-600 bg-rose-50" />
-      </div>
-
-      {/* Quick Access */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-lg font-bold text-gov-dark-blue">Scheme Applications</h2>
-          <p className="text-sm text-gray-500 mt-1">
-            {stats?.pendingCount || 0} pending + {stats?.underReviewCount || 0} under review applications need your attention.
-          </p>
-        </div>
-        <Link
-          href="/admin/applications"
-          className="rounded-lg bg-gov-dark-blue px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gov-dark-blue/90 flex items-center gap-2 shrink-0"
-        >
-          View All Applications
-          <ArrowRight className="h-4 w-4" />
-        </Link>
+      <div>
+        {activeTab === "overview" && <AdminOverviewTab />}
+        {activeTab === "vulnerability" && <VulnerabilityTab />}
+        {activeTab === "fraud" && <FraudTab />}
       </div>
     </div>
   );
 }
 
-/* ─── VERIFIER DASHBOARD (kept from before) ──────────────────────── */
-
 function VerifierDashboard() {
-  const [stats, setStats] = useState({ pendingCount: 0, verifiedCount: 0, flaggedCount: 0 });
+  const [stats, setStats] = useState({
+    pendingCount: 0,
+    verifiedCount: 0,
+    flaggedCount: 0,
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get("/api/verifier/stats")
+    api
+      .get("/api/verifier/stats")
       .then((res) => setStats(res.data.stats))
       .catch((err) => console.error("Failed to load stats", err))
       .finally(() => setLoading(false));
@@ -281,18 +661,38 @@ function VerifierDashboard() {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-3">
-        <StatCard title="Pending Verifications" value={stats.pendingCount.toString()} icon={<Clock className="h-5 w-5" />} color="text-amber-600 bg-amber-50" />
-        <StatCard title="Total Processed" value={stats.verifiedCount.toString()} icon={<CheckCircle className="h-5 w-5" />} color="text-green-600 bg-green-50" />
-        <StatCard title="Flagged Issues" value={stats.flaggedCount.toString()} icon={<AlertTriangle className="h-5 w-5" />} color="text-red-600 bg-red-50" />
+        <StatCard
+          title="Pending Verifications"
+          value={stats.pendingCount.toString()}
+          icon={<Clock className="h-5 w-5" />}
+          color="text-amber-600 bg-amber-50"
+        />
+        <StatCard
+          title="Total Processed"
+          value={stats.verifiedCount.toString()}
+          icon={<CheckCircle className="h-5 w-5" />}
+          color="text-green-600 bg-green-50"
+        />
+        <StatCard
+          title="Flagged Issues"
+          value={stats.flaggedCount.toString()}
+          icon={<AlertTriangle className="h-5 w-5" />}
+          color="text-red-600 bg-red-50"
+        />
       </div>
-      
+
       {/* Quick Access Block */}
       <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-gov-dark-blue">Applications Review</h2>
-          <p className="text-sm text-gray-500 mt-1">You have {stats.pendingCount} pending applications waiting for your review.</p>
+          <h2 className="text-lg font-bold text-gov-dark-blue">
+            Applications Review
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">
+            You have {stats.pendingCount} pending applications waiting for your
+            review.
+          </p>
         </div>
-        <Link 
+        <Link
           href="/verifier/reviews"
           className="rounded-lg bg-gov-dark-blue px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gov-dark-blue/90 flex items-center gap-2"
         >
@@ -304,32 +704,49 @@ function VerifierDashboard() {
   );
 }
 
-/* ─── SHARED COMPONENTS ──────────────────────────────────────────── */
+// ────────────────────────────────
+// MAIN PAGE COMPONENT
+// ────────────────────────────────
 
-function StatCard({ title, value, icon, color, capitalize }: {
-  title: string; value: string; icon: React.ReactNode; color: string; capitalize?: boolean;
-}) {
-  return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 md:p-5 shadow-sm">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">{title}</p>
-        <div className={`p-2 rounded-lg ${color}`}>{icon}</div>
-      </div>
-      <p className={`text-lg md:text-2xl font-bold text-gov-dark-blue ${capitalize ? "capitalize" : ""}`}>
-        {value}
-      </p>
-    </div>
-  );
+/* ─── DASHBOARD PAGE ────────────────────────────────────────────── */
+
+interface CitizenProfileData {
+  income: number;
+  employment_status: string;
+  family_size: number;
+  education_level: string;
+  health_condition: boolean;
+  housing_type: string;
+  disaster_risk: string;
+  address: string;
+  district: string;
+  phoneNumber: string;
+  documents: string[];
+  vulnerabilityScore: number;
+  verificationStatus: string;
 }
 
-function InfoCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+export default function DashboardPage() {
+  const { user } = useAppSelector((state) => state.auth);
+
+  if (!user) return null;
+
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm flex items-center gap-3">
-      <div className="p-2 rounded-lg bg-gray-100 text-gray-500 flex-shrink-0">{icon}</div>
-      <div className="min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">{label}</p>
-        <p className="text-sm font-semibold text-gov-dark-blue capitalize truncate">{value}</p>
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Header Section */}
+      <div className="flex flex-col gap-1">
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-gov-dark-blue">
+          Dashboard Overview
+        </h1>
+        <p className="text-sm text-gray-500">
+          Welcome back,{" "}
+          <span className="font-semibold text-gov-dark-blue">{user.name}</span>
+        </p>
       </div>
+
+      {user.role === "admin" && <AdminDashboard />}
+      {user.role === "verifier" && <VerifierDashboard />}
+      {user.role === "citizen" && <CitizenDashboard />}
     </div>
   );
 }

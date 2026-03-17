@@ -19,11 +19,6 @@ export default function LoginPage() {
   const { loading, error } = useAppSelector((state) => state.auth);
   const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL!;
 
-  useEffect(() => {
-    // Intentionally left blank or can be removed.
-    // We are no longer using localStorage for the email, as we now use session vs persistent cookies.
-  }, []);
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     dispatch(clearError());
