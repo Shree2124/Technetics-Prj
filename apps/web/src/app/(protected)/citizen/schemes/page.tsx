@@ -31,45 +31,12 @@ const categories = [
 
 const ITEMS_PER_PAGE = 6;
 
-const checkEligibility = (scheme, profile) => {
-  if (!profile || !profile.age) return { isEligible: false, checks: [] };
-
-  const { eligibility } = scheme;
-  const checks = [];
-  let metCriteria = 0;
-
-  const addCheck = (criterion, isMet) => {
-    checks.push({ criterion, met: isMet });
-    if (isMet) metCriteria++;
-  };
-
-  if (eligibility.minAge !== undefined)
-    addCheck(
-      `Minimum Age: ${eligibility.minAge}`,
-      profile.age >= eligibility.minAge,
-    );
-  if (eligibility.maxAge !== undefined)
-    addCheck(
-      `Maximum Age: ${eligibility.maxAge}`,
-      profile.age <= eligibility.maxAge,
-    );
-  if (eligibility.maxIncome !== undefined)
-    addCheck(
-      `Maximum Income: ₹${eligibility.maxIncome.toLocaleString()}`,
-      profile.income <= eligibility.maxIncome,
-    );
-  if (eligibility.ruralOnly)
-    addCheck("Must be in a rural area", profile.ruralFlag === true);
-  if (eligibility.minFamilySize !== undefined)
-    addCheck(
-      `Minimum Family Size: ${eligibility.minFamilySize}`,
-      profile.familySize >= eligibility.minFamilySize,
-    );
-
-  return { isEligible: metCriteria === checks.length, checks };
+const checkEligibility = (scheme: any, profile: any) => {
+  // Temporarily bypassing eligibility check logic to show all schemes as eligible
+  return { isEligible: true, checks: [] as any[] };
 };
 
-const SchemeCard = ({ scheme, profile }) => {
+const SchemeCard = ({ scheme, profile }: { scheme: any, profile: any }) => {
   const { isEligible, checks } = useMemo(
     () => checkEligibility(scheme, profile),
     [scheme, profile],
@@ -152,7 +119,9 @@ const SchemeCard = ({ scheme, profile }) => {
           href={`/citizen/schemes/apply?id=${scheme._id}&name=${encodeURIComponent(scheme.schemeName)}`}
           className={`w-full flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${isEligible ? "bg-gov-dark-blue text-white hover:bg-gov-dark-blue/90" : "bg-gray-200 text-gray-500 cursor-not-allowed"}`}
           // aria-disabled={!isEligible}
-          onClick={(e) => e.preventDefault()}
+          onClick={(e) => {
+            if (!isEligible) e.preventDefault();
+          }}
         >
           Apply Now <ArrowRight className="h-4 w-4" />
         </Link>
@@ -162,8 +131,8 @@ const SchemeCard = ({ scheme, profile }) => {
 };
 
 export default function SchemesPage() {
-  const [allSchemes, setAllSchemes] = useState([]);
-  const [profile, setProfile] = useState(null);
+  const [allSchemes, setAllSchemes] = useState<any[]>([]);
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
