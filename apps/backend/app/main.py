@@ -5,7 +5,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastapi import FastAPI
-from app.routes import vulnerability, fraud, recommendation, scheme, analysis
+from app.routes import vulnerability, fraud, recommendation
 
 app = FastAPI(
     title="AI Welfare Allocation Service",
@@ -13,8 +13,6 @@ app = FastAPI(
 )
 
 app.include_router(vulnerability.router)
-app.include_router(scheme.router)
-app.include_router(analysis.router)
 app.include_router(recommendation.router)
 
 

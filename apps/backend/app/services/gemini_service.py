@@ -8,7 +8,6 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 if not GEMINI_API_KEY:
     print("Warning: GEMINI_API_KEY is not set. Vulnerability analysis will not be available.")
-    genai.configure(api_key="DUMMY_KEY") # Configure with a dummy key to avoid crashing
 else:
     genai.configure(api_key=GEMINI_API_KEY)
 
