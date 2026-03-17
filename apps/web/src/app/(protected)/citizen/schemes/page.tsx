@@ -151,8 +151,8 @@ const SchemeCard = ({ scheme, profile }) => {
         <Link
           href={`/citizen/schemes/apply?id=${scheme._id}&name=${encodeURIComponent(scheme.schemeName)}`}
           className={`w-full flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${isEligible ? "bg-gov-dark-blue text-white hover:bg-gov-dark-blue/90" : "bg-gray-200 text-gray-500 cursor-not-allowed"}`}
-          aria-disabled={!isEligible}
-          onClick={(e) => !isEligible && e.preventDefault()}
+          // aria-disabled={!isEligible}
+          onClick={(e) => e.preventDefault()}
         >
           Apply Now <ArrowRight className="h-4 w-4" />
         </Link>

@@ -1,38 +1,46 @@
 from app.db import get_db
 
-def get_scheme_recommendations(data):
+def get_scheme_recommendations(citizen_profile):
     """
-    Recommends schemes based on citizen data from the database.
+    Recommends schemes based on a strict rule-based eligibility check.
+    A citizen must meet all criteria to be eligible.
     """
     db = get_db()
     schemes = list(db.schemes.find({"active": True}))
     recommendations = []
 
     for scheme in schemes:
-        score = 0
-        eligibility = scheme.get('eligibility', {})
-        num_criteria = len(eligibility)
+        is_eligible = True
+        eligibility_criteria = scheme.get('eligibility', {})
 
-        if num_criteria == 0: continue
+        if not eligibility_criteria: 
+            continue
 
-        # Simple matching logic based on schema
-        if 'maxIncome' in eligibility and data.income <= eligibility['maxIncome']:
-            score += 1
-        if 'minFamilySize' in eligibility and data.family_size >= eligibility['minFamilySize']:
-            score += 1
+        # Age check
+        if 'minAge' in eligibility_criteria and citizen_profile.get('age', 0) < eligibility_criteria['minAge']:
+            is_eligible = False
+        if 'maxAge' in eligibility_criteria and citizen_profile.get('age', 100) > eligibility_criteria['maxAge']:
+            is_eligible = False
         
-        # Placeholder for more complex criteria matching if added to the schema
-        # e.g., if 'employment_status' in eligibility and data.employment_status in eligibility['employment_status']:
-        #     score += 1
+        # Income check
+        if 'maxIncome' in eligibility_criteria and citizen_profile.get('income', float('inf')) > eligibility_criteria['maxIncome']:
+            is_eligible = False
 
-        if score > 0:
-            matching_percentage = (score / num_criteria) * 100
+        # Rural check
+        if eligibility_criteria.get('ruralOnly') and not citizen_profile.get('ruralFlag'):
+            is_eligible = False
+
+        # Family size check
+        if 'minFamilySize' in eligibility_criteria and citizen_profile.get('familySize', 1) < eligibility_criteria['minFamilySize']:
+            is_eligible = False
+
+        if is_eligible:
             recommendations.append({
                 "scheme_id": str(scheme['_id']),
                 "scheme_name": scheme['schemeName'],
                 "description": scheme['description'],
-                "matching_score": round(matching_percentage, 2)
+                "category": scheme.get('category', 'N/A'),
+                "benefitAmount": scheme.get('benefitAmount', 0)
             })
-
-    recommendations.sort(key=lambda x: x['matching_score'], reverse=True)
+            
     return recommendations
