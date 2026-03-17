@@ -359,6 +359,87 @@ function VulnerabilityTab() {
   );
 }
 
+function SchemesTab() {
+  const [schemes, setSchemes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api
+      .get("/api/schemes")
+      .then((res) => setSchemes(res.data))
+      .catch((err) => console.error("Failed to load schemes", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-gov-mid-blue border-t-transparent" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Link
+          href="/admin/add-scheme"
+          className="rounded-lg bg-gov-dark-blue px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gov-dark-blue/90"
+        >
+          Add New Scheme
+        </Link>
+      </div>
+      <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-x-auto">
+        <table className="w-full table-auto text-sm">
+          <thead className="bg-gray-50/60">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Scheme Name
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Category
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Benefit Amount
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {schemes.map((scheme) => (
+              <tr key={scheme._id}>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="font-medium text-gray-900">
+                    {scheme.schemeName}
+                  </div>
+                  <div className="text-xs text-gray-500 truncate max-w-xs">
+                    {scheme.description}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                  {scheme.category}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                  ₹{scheme.benefitAmount.toLocaleString("en-IN")}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span
+                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${scheme.active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                  >
+                    {scheme.active ? "Active" : "Inactive"}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function FraudTab() {
   const [applications, setApplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -414,14 +495,24 @@ function FraudTab() {
 
 function CitizenDashboard() {
   const [profile, setProfile] = useState<CitizenProfileData | null>(null);
+  const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api
-      .get("/api/citizen/profile")
-      .then((res) => setProfile(res.data.profile))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    const fetchDashboardData = async () => {
+      try {
+        const profileRes = await api.get("/api/citizen/profile");
+        setProfile(profileRes.data.profile);
+        const statsRes = await api.get("/api/citizen/stats");
+        setStats(statsRes.data.stats);
+      } catch (error) {
+        console.error("Failed to load citizen dashboard data", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
   }, []);
 
   if (loading) {
@@ -451,33 +542,28 @@ function CitizenDashboard() {
       {/* Stats Grid */}
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Monthly Income"
-          value={profile ? `₹${profile.income.toLocaleString("en-IN")}` : "—"}
-          icon={<IndianRupee className="h-5 w-5" />}
-          color="text-green-600 bg-green-50"
+          title="Total Applications"
+          value={stats?.total?.toString() || "0"}
+          icon={<FileText className="h-5 w-5" />}
+          color="text-blue-600 bg-blue-50"
         />
         <StatCard
-          title="Vulnerability Score"
-          value={profile ? `${profile.vulnerabilityScore}/100` : "—"}
-          icon={<Gauge className="h-5 w-5" />}
+          title="Pending"
+          value={stats?.pending?.toString() || "0"}
+          icon={<Clock className="h-5 w-5" />}
           color="text-amber-600 bg-amber-50"
         />
         <StatCard
-          title="Verification"
-          value={profile?.verificationStatus || "—"}
-          icon={<UserCheck className="h-5 w-5" />}
-          color={
-            profile?.verificationStatus === "verified"
-              ? "text-green-600 bg-green-50"
-              : "text-amber-600 bg-amber-50"
-          }
-          capitalize
+          title="Approved"
+          value={stats?.approved?.toString() || "0"}
+          icon={<CheckCircle className="h-5 w-5" />}
+          color="text-green-600 bg-green-50"
         />
         <StatCard
-          title="Family Size"
-          value={profile ? `${profile.family_size} Members` : "—"}
-          icon={<Users className="h-5 w-5" />}
-          color="text-blue-600 bg-blue-50"
+          title="Rejected"
+          value={stats?.rejected?.toString() || "0"}
+          icon={<AlertTriangle className="h-5 w-5" />}
+          color="text-red-600 bg-red-50"
         />
       </div>
 
@@ -622,6 +708,12 @@ function AdminDashboard() {
             setActiveTab={setActiveTab}
             icon={<ShieldCheck />}
           />
+          <TabButton
+            name="schemes"
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            icon={<FileText />}
+          />
         </nav>
       </div>
 
@@ -629,6 +721,7 @@ function AdminDashboard() {
         {activeTab === "overview" && <AdminOverviewTab />}
         {activeTab === "vulnerability" && <VulnerabilityTab />}
         {activeTab === "fraud" && <FraudTab />}
+        {activeTab === "schemes" && <SchemesTab />}
       </div>
     </div>
   );

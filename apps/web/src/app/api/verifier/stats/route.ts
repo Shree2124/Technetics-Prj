@@ -12,25 +12,31 @@ export async function GET() {
     if (!currentUser || currentUser.role !== "verifier") {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
-    // 1. Get total pending
+    // 1. Get total pending for this verifier
     const pendingCount = await CitizenProfile.countDocuments({
       verificationStatus: "pending",
+      verifierId: currentUser._id,
     });
 
     // 2. Get today's processed verifications (by this verifier)
-    // We would need to track verification history for "today's processed" accurately, 
+    // We would need to track verification history for "today's processed" accurately,
     // but for now we fallback to the total verified Citizens by this verifier
-    const verifierProfile = await VerifierProfile.findOne({ userId: currentUser._id });
-    const verifiedCount = verifierProfile ? verifierProfile.verifiedCitizens.length : 0;
+    const verifierProfile = await VerifierProfile.findOne({
+      userId: currentUser._id,
+    });
+    const verifiedCount = verifierProfile
+      ? verifierProfile.verifiedCitizens.length
+      : 0;
 
-    // 3. Flagged issues (Currently mocking this, but could be based on high vulnerability scores or fraud triggers)
+    // 3. Flagged issues for this verifier
     const flaggedCount = await CitizenProfile.countDocuments({
       verificationStatus: "pending",
-      vulnerabilityScore: { $gte: 80 }
+      verifierId: currentUser._id,
+      vulnerabilityScore: { $gte: 80 },
     });
 
     return NextResponse.json({
@@ -39,13 +45,12 @@ export async function GET() {
         pendingCount,
         verifiedCount,
         flaggedCount,
-      }
+      },
     });
-
   } catch (error: any) {
     return NextResponse.json(
       { success: false, message: error.message || "Server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

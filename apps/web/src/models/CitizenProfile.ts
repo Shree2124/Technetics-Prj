@@ -22,7 +22,8 @@ export interface ICitizenProfile extends Document {
   disability: boolean;
   propertyOwned: number;
   bankAccount: string;
-  verificationStatus: string;
+  verificationStatus: "pending" | "verified" | "rejected";
+  verifierId: mongoose.Types.ObjectId;
   vulnerabilityScore: number;
   createdAt: Date;
 }
@@ -60,6 +61,7 @@ const CitizenProfileSchema = new Schema<ICitizenProfile>(
       enum: ["pending", "verified", "rejected"],
       default: "pending",
     },
+    verifierId: { type: Schema.Types.ObjectId, ref: "User" },
     vulnerabilityScore: { type: Number, default: 0 },
   },
   { timestamps: { createdAt: true, updatedAt: false } },
