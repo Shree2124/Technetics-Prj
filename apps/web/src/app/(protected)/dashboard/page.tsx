@@ -132,6 +132,64 @@ function TabButton({
   );
 }
 
+function VulnerabilityAnalysisModal({
+  citizen,
+  onClose,
+}: {
+  citizen: any;
+  onClose: () => void;
+}) {
+  const [analysis, setAnalysis] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (citizen) {
+      api
+        .get(`/api/analysis/vulnerability/${citizen._id}`)
+        .then((res) => setAnalysis(res.data.analysis))
+        .catch((err) =>
+          setAnalysis(
+            `Failed to load analysis: ${err.response?.data?.detail || err.message}`,
+          ),
+        )
+        .finally(() => setLoading(false));
+    }
+  }, [citizen]);
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-lg max-w-2xl w-full">
+        <div className="p-4 border-b">
+          <h2 className="text-lg font-semibold text-gov-dark-blue">
+            Vulnerability Analysis for {citizen.userId.name}
+          </h2>
+        </div>
+        <div className="p-6 max-h-[70vh] overflow-y-auto prose prose-sm max-w-none">
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-gov-mid-blue border-t-transparent" />
+            </div>
+          ) : (
+            <div
+              dangerouslySetInnerHTML={{
+                __html: analysis.replace(/\n/g, "<br />"),
+              }}
+            />
+          )}
+        </div>
+        <div className="p-3 bg-gray-50 rounded-b-xl text-right">
+          <button
+            onClick={onClose}
+            className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function RecommendationsModal({
   citizen,
   recommendations,
@@ -284,7 +342,8 @@ function VulnerabilityTab() {
   const [loading, setLoading] = useState(true);
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [selectedCitizen, setSelectedCitizen] = useState<any>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRecModalOpen, setIsRecModalOpen] = useState(false);
+  const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false);
 
   useEffect(() => {
     api
@@ -297,11 +356,16 @@ function VulnerabilityTab() {
   const handleGetRecommendations = (citizen: any) => {
     setSelectedCitizen(citizen);
     setRecommendations([]); // Clear previous recommendations
-    setIsModalOpen(true);
+    setIsRecModalOpen(true);
     api
       .get(`/api/admin/recommendations?citizenId=${citizen._id}`)
       .then((res) => setRecommendations(res.data.recommendations))
       .catch((err) => console.error("Failed to load recommendations", err));
+  };
+
+  const handleViewAnalysis = (citizen: any) => {
+    setSelectedCitizen(citizen);
+    setIsAnalysisModalOpen(true);
   };
 
   if (loading) {
@@ -339,6 +403,12 @@ function VulnerabilityTab() {
                 <p className="text-xs text-gray-400">Vulnerability</p>
               </div>
               <button
+                onClick={() => handleViewAnalysis(citizen)}
+                className="rounded-lg bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-200"
+              >
+                View Details
+              </button>
+              <button
                 onClick={() => handleGetRecommendations(citizen)}
                 className="rounded-lg bg-gov-dark-blue px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-gov-dark-blue/90"
               >
@@ -348,11 +418,17 @@ function VulnerabilityTab() {
           </div>
         ))}
       </div>
-      {isModalOpen && (
+      {isRecModalOpen && (
         <RecommendationsModal
           citizen={selectedCitizen}
           recommendations={recommendations}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => setIsRecModalOpen(false)}
+        />
+      )}
+      {isAnalysisModalOpen && (
+        <VulnerabilityAnalysisModal
+          citizen={selectedCitizen}
+          onClose={() => setIsAnalysisModalOpen(false)}
         />
       )}
     </div>
