@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const user = await getCurrentUser();
 
-  if (!user || !["admin", "verifier"].includes(user.role)) {
+  if (!user || !["admin", "verifier", "citizen"].includes(user.role)) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
