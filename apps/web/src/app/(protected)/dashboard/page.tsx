@@ -161,7 +161,7 @@ function VulnerabilityAnalysisModal({
       <div className="bg-white rounded-xl shadow-lg max-w-2xl w-full">
         <div className="p-4 border-b">
           <h2 className="text-lg font-semibold text-gov-dark-blue">
-            Vulnerability Analysis for {citizen.userId.name}
+            Vulnerability Analysis for {citizen?.userId?.name || "..."}
           </h2>
         </div>
         <div className="p-6 max-h-[70vh] overflow-y-auto prose prose-sm max-w-none">
@@ -204,16 +204,16 @@ function RecommendationsModal({
       <div className="bg-white rounded-xl shadow-lg max-w-lg w-full">
         <div className="p-4 border-b">
           <h2 className="text-lg font-semibold text-gov-dark-blue">
-            Scheme Recommendations for {citizen.userId.name}
+            Scheme Recommendations for {citizen?.userId?.name || "..."}
           </h2>
         </div>
         <div className="p-4 max-h-[60vh] overflow-y-auto">
           {recommendations.length > 0 ? (
             <div className="space-y-3">
               {recommendations.map((rec, i) => (
-                <div key={i} className="p-3 rounded-lg bg-gray-50">
+                <div key={rec._id} className="p-3 rounded-lg bg-gray-50">
                   <p className="font-semibold text-gov-dark-blue">
-                    {rec.scheme_name}
+                    {rec.schemeName}
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
                     {rec.description}
@@ -391,7 +391,7 @@ function VulnerabilityTab() {
           >
             <div>
               <p className="font-semibold text-gov-dark-blue">
-                {citizen.userId.name}
+                {citizen.userId?.name || "Unnamed Citizen"}
               </p>
               <p className="text-xs text-gray-500">{citizen.district}</p>
             </div>
@@ -528,7 +528,7 @@ function FraudTab() {
       .then((res) => setApplications(res.data.applications))
       .catch((err) => console.error("Failed to load fraud applications", err))
       .finally(() => setLoadingApps(false));
-      
+
     api
       .get("/api/admin/citizens?verification=rejected")
       .then((res) => setCitizens(res.data.citizens || []))
@@ -557,22 +557,33 @@ function FraudTab() {
           </span>
         </div>
         <div className="divide-y divide-gray-100">
-          {applications.length > 0 ? applications.map((app) => (
-            <div key={app._id} className="p-4 flex items-center justify-between">
-              <div>
-                <p className="font-semibold text-gov-dark-blue">
-                  {app.userId?.name || app.citizenId?.userId?.name || "Unknown"}
-                </p>
-                <p className="text-xs text-gray-500">{app.schemeId?.name || app.schemeId?.schemeName || "Unknown Scheme"}</p>
+          {applications.length > 0 ? (
+            applications.map((app) => (
+              <div
+                key={app._id}
+                className="p-4 flex items-center justify-between"
+              >
+                <div>
+                  <p className="font-semibold text-gov-dark-blue">
+                    {app.userId?.name ||
+                      app.citizenId?.userId?.name ||
+                      "Unknown"}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {app.schemeId?.name ||
+                      app.schemeId?.schemeName ||
+                      "Unknown Scheme"}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-bold text-red-600">
+                    {app.fraudScore || 0}%
+                  </p>
+                  <p className="text-xs text-gray-400">Fraud Score</p>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-lg font-bold text-red-600">
-                  {app.fraudScore || 0}%
-                </p>
-                <p className="text-xs text-gray-400">Fraud Score</p>
-              </div>
-            </div>
-          )) : (
+            ))
+          ) : (
             <div className="p-8 text-center text-sm text-gray-500">
               No fraud flagged applications found.
             </div>
@@ -591,35 +602,43 @@ function FraudTab() {
           </span>
         </div>
         <div className="divide-y divide-gray-100">
-          {citizens.length > 0 ? citizens.map((c) => {
-            const p = c.profile || {};
-            return (
-              <div key={c._id} className="p-4 flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="font-semibold text-gov-dark-blue">
-                      {c.name}
+          {citizens.length > 0 ? (
+            citizens.map((c) => {
+              const p = c.profile || {};
+              return (
+                <div
+                  key={c._id}
+                  className="p-4 flex items-center justify-between"
+                >
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold text-gov-dark-blue">
+                        {c.name}
+                      </p>
+                      <span className="text-[10px] uppercase font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-100">
+                        Fraud
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {c.email} {p.phone ? `• ${p.phone}` : ""}
                     </p>
-                    <span className="text-[10px] uppercase font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-100">Fraud</span>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {p.address?.district ? `${p.address.district}, ` : ""}
+                      {p.address?.state || "Unknown Location"}
+                    </p>
                   </div>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {c.email} {p.phone ? `• ${p.phone}` : ""}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    {p.address?.district ? `${p.address.district}, ` : ""}{p.address?.state || "Unknown Location"}
-                  </p>
-                </div>
-                <div className="text-right flex flex-col items-end gap-1">
-                  <div className="text-right">
-                     <p className="text-lg font-bold text-red-600">
-                       {p.vulnerabilityScore ?? 0}/100
-                     </p>
-                     <p className="text-xs text-gray-400">Score</p>
+                  <div className="text-right flex flex-col items-end gap-1">
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-red-600">
+                        {p.vulnerabilityScore ?? 0}/100
+                      </p>
+                      <p className="text-xs text-gray-400">Score</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          }) : (
+              );
+            })
+          ) : (
             <div className="p-8 text-center text-sm text-gray-500">
               No fraud flagged citizens found.
             </div>
@@ -633,6 +652,56 @@ function FraudTab() {
 // ────────────────────────────────
 // ROLE-SPECIFIC DASHBOARDS
 // ────────────────────────────────
+
+function TopRecommendations() {
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api
+      .get("/api/citizen/recommendations")
+      .then((res) => setRecommendations(res.data.recommendations))
+      .catch((err) => console.error("Failed to load recommendations", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="border-b border-gray-100 bg-gray-50/60 px-5 py-3">
+        <h2 className="text-sm font-semibold text-gov-dark-blue">
+          Top Recommended Schemes for You
+        </h2>
+      </div>
+      <div className="p-4 space-y-3">
+        {loading ? (
+          <p className="text-sm text-gray-500 text-center py-4">
+            Loading recommendations...
+          </p>
+        ) : recommendations.length > 0 ? (
+          recommendations.slice(0, 3).map((rec) => (
+            <Link
+              key={rec._id}
+              href={`/citizen/schemes/apply?id=${rec._id}&name=${encodeURIComponent(rec.schemeName)}`}
+              className="block p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+            >
+              <p className="font-semibold text-gov-dark-blue">
+                {rec.schemeName}
+              </p>
+              <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                {rec.description}
+              </p>
+            </Link>
+          ))
+        ) : (
+          <p className="text-sm text-gray-500 text-center py-4">
+            No specific recommendations at this time. You can browse all
+            schemes.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function CitizenDashboard() {
   const [profile, setProfile] = useState<CitizenProfileData | null>(null);
@@ -805,6 +874,9 @@ function CitizenDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Top Recommendations */}
+      <TopRecommendations />
 
       {/* Help Banner */}
       <div className="rounded-xl bg-gradient-to-r from-gov-dark-blue to-gov-mid-blue p-5 flex gap-4 items-start text-white">

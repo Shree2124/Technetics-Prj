@@ -1,40 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dbConnect from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth";
 import CitizenProfile from "@/models/CitizenProfile";
 import Scheme from "@/models/Scheme";
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY || "");
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
-interface CitizenProfileLean {
-  age: number | null;
-  income: number | null;
-  employmentStatus: string | null;
-  familySize: number | null;
-  educationLevel: string | null;
-  disability: boolean | null;
-  ruralFlag: boolean | null;
-  vulnerabilityScore: number | null;
-}
-
-interface SchemeLean {
-  category: string;
-  active: boolean;
-}
-
-export async function GET(req: NextRequest): Promise<NextResponse> {
-  const { searchParams } = new URL(req.url);
-  const citizenId = searchParams.get("citizenId");
-
-  if (!citizenId) {
-    return NextResponse.json(
-      { success: false, message: "Citizen ID is required" },
-      { status: 400 },
-    );
-  }
-
-  if (!GEMINI_API_KEY) {
+export async function GET(req: NextRequest) {
+  if (!process.env.GEMINI_API_KEY) {
     return NextResponse.json(
       { error: "Gemini API key is not configured." },
       { status: 500 },
@@ -43,13 +17,22 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
   try {
     await dbConnect();
+    const user = await getCurrentUser();
+
+    if (!user || user.role !== "citizen") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const [citizen, schemes] = await Promise.all([
-      CitizenProfile.findById(citizenId).lean<CitizenProfileLean>(),
+      CitizenProfile.findOne({ userId: user.id }).lean(),
       Scheme.find({ active: true }).lean(),
     ]);
 
     if (!citizen) {
-      return NextResponse.json({ error: "Citizen not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Citizen profile not found" },
+        { status: 404 },
+      );
     }
 
     const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
@@ -68,7 +51,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       - Vulnerability Score: ${citizen.vulnerabilityScore || "N/A"}/100
 
       **Available Scheme Categories:**
-      ${[...new Set(schemes.map((s) => s.category))].join(", ")}
+      ${[...new Set(schemes.map((s: any) => s.category))].join(", ")}
 
       **Recommended Categories (comma-separated):**
     `;
@@ -78,7 +61,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     const text = response.text();
     const recommendedCategories = text.split(",").map((c: string) => c.trim());
 
-    const recommendedSchemes = schemes?.filter((scheme: SchemeLean) =>
+    const recommendedSchemes = schemes.filter((scheme: any) =>
       recommendedCategories.includes(scheme.category),
     );
 

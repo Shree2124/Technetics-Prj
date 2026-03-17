@@ -36,7 +36,7 @@ const checkEligibility = (scheme: any, profile: any) => {
   return { isEligible: true, checks: [] as any[] };
 };
 
-const SchemeCard = ({ scheme, profile }: { scheme: any, profile: any }) => {
+const SchemeCard = ({ scheme, profile }: { scheme: any; profile: any }) => {
   const { isEligible, checks } = useMemo(
     () => checkEligibility(scheme, profile),
     [scheme, profile],
@@ -132,24 +132,49 @@ const SchemeCard = ({ scheme, profile }: { scheme: any, profile: any }) => {
 
 export default function SchemesPage() {
   const [allSchemes, setAllSchemes] = useState<any[]>([]);
+  const [recommendedSchemes, setRecommendedSchemes] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+
+  const categories = useMemo(() => {
+    const baseCategories = [
+      "All",
+      "Agriculture",
+      "Healthcare",
+      "Housing",
+      "Education",
+      "Finance",
+      "Energy",
+      "Women & Child",
+      "Social Welfare",
+      "Employment",
+      "Rural Development",
+    ];
+    return recommendedSchemes.length > 0
+      ? ["Recommended", ...baseCategories]
+      : baseCategories;
+  }, [recommendedSchemes.length]);
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [schemesRes, profileRes] = await Promise.all([
+        const [schemesRes, profileRes, recsRes] = await Promise.all([
           api.get("/api/schemes"),
           api.get("/api/citizen/profile"),
+          api.get("/api/citizen/recommendations"),
         ]);
         setAllSchemes(schemesRes.data);
         setProfile(profileRes.data.profile);
+        setRecommendedSchemes(recsRes.data.recommendations);
+        if (recsRes.data.recommendations.length > 0) {
+          setSelectedCategory("Recommended");
+        }
       } catch (error) {
-        console.error("Failed to load data", error);
+        console.error("Failed to load page data", error);
       } finally {
         setLoading(false);
       }
@@ -159,12 +184,21 @@ export default function SchemesPage() {
 
   const filtered = useMemo(() => {
     if (loading) return [];
-    return allSchemes.filter((s) => {
+
+    const sourceSchemes =
+      selectedCategory === "Recommended" ? recommendedSchemes : allSchemes;
+
+    return sourceSchemes.filter((s: any) => {
       const matchSearch =
         s.schemeName.toLowerCase().includes(search.toLowerCase()) ||
         s.description.toLowerCase().includes(search.toLowerCase());
-      const matchCategory =
-        selectedCategory === "All" || s.category === selectedCategory;
+
+      let matchCategory = true;
+      if (selectedCategory !== "Recommended") {
+        matchCategory =
+          selectedCategory === "All" || s.category === selectedCategory;
+      }
+
       return matchSearch && matchCategory;
     });
   }, [search, selectedCategory, allSchemes, loading]);
