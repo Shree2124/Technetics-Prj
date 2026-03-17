@@ -29,7 +29,7 @@ const VERIFICATION_TABS = [
   { key: "all", label: "All Citizens", icon: Users },
   { key: "pending", label: "Pending", icon: Clock },
   { key: "verified", label: "Verified", icon: CheckCircle },
-  { key: "rejected", label: "Rejected", icon: XCircle },
+  { key: "rejected", label: "Frauds (Rejected)", icon: AlertTriangle },
 ];
 
 const verificationBadge = (status: string) => {
@@ -158,6 +158,60 @@ export default function AdminCitizensPage() {
             <Users className="h-12 w-12 mb-3 text-gray-300" />
             <p className="text-sm font-medium">No citizens found</p>
             <p className="text-xs mt-1">Try adjusting your filters or search</p>
+          </div>
+        ) : activeTab === "rejected" ? (
+          <div className="p-4 grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {paginatedCitizens.map((c) => {
+              const p = (c.profile || {}) as any;
+              return (
+                <div key={c._id} className="rounded-xl border border-red-200 bg-red-50/30 overflow-hidden shadow-sm flex flex-col hover:shadow-md transition-shadow">
+                  <div className="p-4 border-b border-red-100 bg-white">
+                    <div className="flex items-start justify-between mb-2">
+                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide bg-red-100 text-red-700">
+                         Fraud / Rejected
+                       </span>
+                       <span className="text-xs font-semibold text-red-700">
+                         Score: {p.vulnerabilityScore ?? 0}/100
+                       </span>
+                     </div>
+                     <h3 className="text-base font-bold text-gov-dark-blue">{c.name}</h3>
+                     <p className="text-xs text-gray-500">{c.email} • {p.phone || "No Phone"}</p>
+                     <p className="text-[11px] text-gray-400 mt-1">Aadhaar: {p.aadhaarNumber || "N/A"}</p>
+                  </div>
+                  <div className="p-4 flex-1 space-y-3 text-xs bg-white text-gray-600">
+                     <div className="grid grid-cols-2 gap-2">
+                       <div><strong>Age:</strong> {p.age || "—"}</div>
+                       <div><strong>Gender:</strong> {p.gender || "—"}</div>
+                       <div><strong>Family Size:</strong> {p.familySize || "—"}</div>
+                       <div><strong>Education:</strong> {p.educationLevel || "—"}</div>
+                     </div>
+                     <div className="bg-gray-50 p-2 rounded-lg border border-gray-100">
+                       <p className="font-semibold text-gray-700 mb-1">Financials & Asset</p>
+                       <p>Income: ₹{p.income?.toLocaleString("en-IN") || "—"}</p>
+                       <p>Employment: {p.employmentStatus || "—"}</p>
+                       <p>Property: {p.propertyOwned ? `${p.propertyOwned} Units` : "None"}</p>
+                       <p>Bank: {p.bankAccount || "—"}</p>
+                     </div>
+                     <div className="bg-gray-50 p-2 rounded-lg border border-gray-100">
+                        <p className="font-semibold text-gray-700 mb-1">Address & Health</p>
+                        <p>Address: {p.address?.village ? `${p.address.village}, ` : ""}{p.address?.district || "—"}, {p.address?.state || "—"} {p.address?.pincode || ""}</p>
+                        <p>Rural: {p.ruralFlag ? "Yes" : "No"}</p>
+                        <p>Health/Disability: {p.healthCondition ? "Issues" : "Good"} / {p.disability ? "Disabled" : "None"}</p>
+                     </div>
+                  </div>
+                  <div className="p-3 border-t border-red-100 bg-white flex justify-end">
+                     <button
+                        onClick={() => handleDelete(c._id)}
+                        disabled={actionLoading === c._id}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 text-xs font-medium text-red-700 hover:bg-red-600 hover:text-white transition-colors border border-red-200 disabled:opacity-50"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Remove Citizen
+                      </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         ) : (
           <>

@@ -518,17 +518,25 @@ function SchemesTab() {
 
 function FraudTab() {
   const [applications, setApplications] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [citizens, setCitizens] = useState<any[]>([]);
+  const [loadingApps, setLoadingApps] = useState(true);
+  const [loadingCitizens, setLoadingCitizens] = useState(true);
 
   useEffect(() => {
     api
       .get("/api/admin/fraud-applications")
       .then((res) => setApplications(res.data.applications))
       .catch((err) => console.error("Failed to load fraud applications", err))
-      .finally(() => setLoading(false));
+      .finally(() => setLoadingApps(false));
+      
+    api
+      .get("/api/admin/citizens?verification=rejected")
+      .then((res) => setCitizens(res.data.citizens || []))
+      .catch((err) => console.error("Failed to load fraud citizens", err))
+      .finally(() => setLoadingCitizens(false));
   }, []);
 
-  if (loading) {
+  if (loadingApps || loadingCitizens) {
     return (
       <div className="flex items-center justify-center py-16">
         <div className="h-6 w-6 animate-spin rounded-full border-2 border-gov-mid-blue border-t-transparent" />
@@ -537,29 +545,86 @@ function FraudTab() {
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-      <div className="border-b border-gray-100 bg-gray-50/60 px-5 py-3">
-        <h2 className="text-sm font-semibold text-gov-dark-blue">
-          Fraud Flagged Applications
-        </h2>
+    <div className="space-y-6">
+      {/* Fraud Applications */}
+      <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="border-b border-gray-100 bg-gray-50/60 px-5 py-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-gov-dark-blue">
+            Fraud Flagged Applications
+          </h2>
+          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+            {applications.length}
+          </span>
+        </div>
+        <div className="divide-y divide-gray-100">
+          {applications.length > 0 ? applications.map((app) => (
+            <div key={app._id} className="p-4 flex items-center justify-between">
+              <div>
+                <p className="font-semibold text-gov-dark-blue">
+                  {app.userId?.name || app.citizenId?.userId?.name || "Unknown"}
+                </p>
+                <p className="text-xs text-gray-500">{app.schemeId?.name || app.schemeId?.schemeName || "Unknown Scheme"}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-bold text-red-600">
+                  {app.fraudScore || 0}%
+                </p>
+                <p className="text-xs text-gray-400">Fraud Score</p>
+              </div>
+            </div>
+          )) : (
+            <div className="p-8 text-center text-sm text-gray-500">
+              No fraud flagged applications found.
+            </div>
+          )}
+        </div>
       </div>
-      <div className="divide-y divide-gray-100">
-        {applications.map((app) => (
-          <div key={app._id} className="p-4 flex items-center justify-between">
-            <div>
-              <p className="font-semibold text-gov-dark-blue">
-                {app.userId.name}
-              </p>
-              <p className="text-xs text-gray-500">{app.schemeId.name}</p>
+
+      {/* Fraud Citizens */}
+      <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="border-b border-gray-100 bg-gray-50/60 px-5 py-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-gov-dark-blue">
+            Fraud Flagged Citizens (Rejected)
+          </h2>
+          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+            {citizens.length}
+          </span>
+        </div>
+        <div className="divide-y divide-gray-100">
+          {citizens.length > 0 ? citizens.map((c) => {
+            const p = c.profile || {};
+            return (
+              <div key={c._id} className="p-4 flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold text-gov-dark-blue">
+                      {c.name}
+                    </p>
+                    <span className="text-[10px] uppercase font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-100">Fraud</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {c.email} {p.phone ? `• ${p.phone}` : ""}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {p.address?.district ? `${p.address.district}, ` : ""}{p.address?.state || "Unknown Location"}
+                  </p>
+                </div>
+                <div className="text-right flex flex-col items-end gap-1">
+                  <div className="text-right">
+                     <p className="text-lg font-bold text-red-600">
+                       {p.vulnerabilityScore ?? 0}/100
+                     </p>
+                     <p className="text-xs text-gray-400">Score</p>
+                  </div>
+                </div>
+              </div>
+            );
+          }) : (
+            <div className="p-8 text-center text-sm text-gray-500">
+              No fraud flagged citizens found.
             </div>
-            <div className="text-right">
-              <p className="text-lg font-bold text-red-600">
-                {app.fraudScore}%
-              </p>
-              <p className="text-xs text-gray-400">Fraud Score</p>
-            </div>
-          </div>
-        ))}
+          )}
+        </div>
       </div>
     </div>
   );
