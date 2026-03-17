@@ -8,8 +8,9 @@ import CitizenProfile from "@/models/CitizenProfile";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  context: { params: { id: string } },
 ) {
+  const { id } = context.params;
   try {
     const user = await getCurrentUser();
 
@@ -20,7 +21,7 @@ export async function GET(
     await dbConnect(); // Fix incorrect import path
 
     const application = await Application.findOne({
-      _id: params.id,
+      _id: id,
       citizenId: user.profile,
     })
       .populate(
@@ -52,8 +53,9 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  context: { params: { id: string } },
 ) {
+  const { id } = context.params;
   try {
     const user = await getCurrentUser();
 
@@ -64,7 +66,7 @@ export async function PUT(
     await dbConnect(); // Fix incorrect import path
 
     const application = await Application.findOne({
-      _id: params.id,
+      _id: id,
       citizenId: user.profile,
     });
 
@@ -106,8 +108,9 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  context: { params: { id: string } },
 ) {
+  const { id } = context.params;
   try {
     const user = await getCurrentUser();
 
@@ -118,7 +121,7 @@ export async function DELETE(
     await dbConnect(); // Fix incorrect import path
 
     const application = await Application.findOne({
-      _id: params.id,
+      _id: id,
       citizenId: user.profile,
     });
 
@@ -147,7 +150,7 @@ export async function DELETE(
     }
 
     // Delete application
-    await Application.findByIdAndDelete(params.id);
+    await Application.findByIdAndDelete(id);
 
     return NextResponse.json({
       success: true,

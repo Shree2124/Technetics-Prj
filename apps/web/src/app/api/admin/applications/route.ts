@@ -32,7 +32,16 @@ export async function GET(req: NextRequest) {
 
     // Get applications with populated refs
     let applications = await Application.find(filter)
-      .populate({ path: "userId", model: User, select: "name email" })
+      .populate({
+        path: "citizenId",
+        model: CitizenProfile,
+        select: "userId", // Ensure userId is selected from CitizenProfile
+        populate: {
+          path: "userId",
+          model: User,
+          select: "name email",
+        },
+      })
       .populate({ path: "schemeId", model: Scheme, select: "name" })
       .sort({ appliedAt: -1 })
       .skip((page - 1) * limit)
